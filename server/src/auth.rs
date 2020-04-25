@@ -13,10 +13,13 @@ use std::collections::HashMap;
 use std::env::var;
 use url::Url;
 
+lazy_static::lazy_static! {
+    static ref REDIRECT_URL: String = std::env::var("REDIRECT_URL").expect("REDIRECT_URL must be set!");
+}
+
 pub async fn login() -> Result<HttpResponse, ServiceError> {
     let endpoint = "https://accounts.google.com/o/oauth2/v2/auth";
     let client_id = var("GOOGLE_CLIENT_ID").expect("GOOGLE_CLIENT_ID must be set!");
-    let redirect_uri = "http://localhost:7777/api/login-code";
     let response_type = "code";
     let scope = "email";
     let access_type = "online";
@@ -25,7 +28,7 @@ pub async fn login() -> Result<HttpResponse, ServiceError> {
     let mut url = Url::parse(endpoint).unwrap();
     url.query_pairs_mut()
         .append_pair("client_id", &client_id)
-        .append_pair("redirect_uri", redirect_uri)
+        .append_pair("redirect_uri", &REDIRECT_URL)
         .append_pair("response_type", response_type)
         .append_pair("scope", scope)
         .append_pair("access_type", access_type)
@@ -43,14 +46,13 @@ pub async fn login_code(
         let client_id = var("GOOGLE_CLIENT_ID").expect("GOOGLE_CLIENT_ID must be set!");
         let client_secret = var("GOOGLE_CLIENT_SECRET").expect("GOOGLE_CLIENT_SECRET must be set!");
         let grant_type = "authorization_code";
-        let redirect_uri = "http://localhost:7777/api/login-code";
 
         let mut request = std::collections::HashMap::new();
         request.insert("client_id".to_string(), client_id);
         request.insert("client_secret".to_string(), client_secret);
         request.insert("code".to_string(), code.to_string());
         request.insert("grant_type".to_string(), grant_type.to_string());
-        request.insert("redirect_uri".to_string(), redirect_uri.to_string());
+        request.insert("redirect_uri".to_string(), REDIRECT_URL.to_string());
 
         let url = Url::parse(endpoint).unwrap();
         let client = Client::default();

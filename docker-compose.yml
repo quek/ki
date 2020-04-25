@@ -32,6 +32,7 @@ services:
       - ./tmp/.cargo:/cargo
     environment:
       SECRET_KEY:
+      REDIRECT_URL:
       GOOGLE_CLIENT_ID:
       GOOGLE_CLIENT_SECRET:
       DATABASE_URL:

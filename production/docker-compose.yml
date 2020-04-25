@@ -22,6 +22,7 @@ services:
     build: ./server
     environment:
       SECRET_KEY:
+      REDIRECT_URL:
       GOOGLE_CLIENT_ID:
       GOOGLE_CLIENT_SECRET:
       DATABASE_URL:
