@@ -20,9 +20,8 @@ impl Component for Model {
     fn view(&self) -> Html {
         html! {
           <>
-            <component::foo::Model />
-            <component::login::Model />
             <component::posts::index::Model />
+            <component::login::Model />
           </>
         }
     }

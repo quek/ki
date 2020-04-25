@@ -45,7 +45,9 @@ impl Component for Model {
     fn view(&self) -> Html {
         let onclick = self.link.callback(|event| Msg::Login(event));
         html! {
-            <a href="/login" onclick=onclick>{"ログイン"}</a>
+          <div>
+            <a href="/login" onclick=onclick>{"_"}</a>
+          </div>
         }
     }
 }

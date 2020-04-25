@@ -49,7 +49,7 @@ impl Component for Model {
             Some(ref post) => {
                 html! {
                   <>
-                    <Link route=AppRoute::Index>{"一覧"}</Link>
+                    <Link route=AppRoute::Index>{"top"}</Link>
                     <div>{&post.title}</div>
                     {utils::markdown_node(&post.body)}
                   </>

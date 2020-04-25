@@ -39,7 +39,6 @@ impl Component for Model {
     fn view(&self) -> Html {
         html! {
           <>
-            <div>{"記事一覧"}</div>
             {for self.posts.iter().map(|post| self.view_post(post))}
           </>
         }
