@@ -6,7 +6,7 @@ ENV LANG ja_JP.UTF-8
 
 RUN apt update && apt install -y libpq-dev
 
-ADD app /
+COPY app /app
 
 WORKDIR /app
 
