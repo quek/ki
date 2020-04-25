@@ -13,7 +13,7 @@ release-build:
 	cp -a ./client/dist ./production/web
 	cp -a ./server/migrations ./production/server/app
 
-deploy:
+deploy: release-build
 	rsync -avz --delete production/ rep:sites/ki
 	ssh rep "cd sites/ki && docker-compose up -d --build"
 
