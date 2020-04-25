@@ -55,6 +55,14 @@ impl Model {
                 {&post.title}
               </Link>
             </h3>
+            <div>
+              <i class="fas fa-upload"></i>
+              {post.published_at.unwrap().format("%Y-%m-%d %H:%M:%S")}
+            </div>
+            <div>
+              <i class="fas fa-history"></i>
+              {post.updated_at.format("%Y-%m-%d %H:%M:%S")}
+            </div>
           </div>
         }
     }
