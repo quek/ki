@@ -1,0 +1,37 @@
+table.week {
+  border-collapse: collapse;
+  th, td {
+    border: 1px #222 solid;
+    padding: 3px;
+    word-break: break-all;
+  }
+  .add-schedule {
+    display: block;
+    width: 100%;
+    min-height: 1.5rem;
+  }
+  .meeting {
+    background-color: #f8f;
+  }
+  .out {
+    background-color: #aaf;
+  }
+  .service {
+    background-color: #faa;
+  }
+  .service-out {
+    background-color: #faa;
+  }
+  .service-in {
+    background-color: #afa;
+  }
+  .staff1 {
+    background-color: yellow;
+  }
+  .staff2 {
+    background-color: cyan;
+  }
+  .visit {
+    background-color: cyan
+  }
+}

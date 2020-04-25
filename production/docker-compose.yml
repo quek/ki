@@ -1,0 +1,34 @@
+version: '3'
+services:
+  db:
+    build: ./db
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER:
+      POSTGRES_PASSWORD:
+      POSTGRES_DB:
+      LANG: ja_JP.UTF-8
+      TZ: Asia/Tokyo
+  web:
+    build: ./web
+    ports:
+      - "7777:80"
+    environment:
+      TZ: Asia/Tokyo
+    depends_on:
+      - server
+  server:
+    build: ./server
+    environment:
+      SECRET_KEY:
+      GOOGLE_CLIENT_ID:
+      GOOGLE_CLIENT_SECRET:
+      DATABASE_URL:
+      TZ: Asia/Tokyo
+      RUST_BACKTRACE: 1
+    depends_on:
+      - db
+volumes:
+  postgresql_data:
+    driver: local

@@ -1,0 +1,45 @@
+version: '3'
+services:
+  db:
+    build: ./docker/db
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER:
+      POSTGRES_PASSWORD:
+      POSTGRES_DB:
+      LANG: ja_JP.UTF-8
+      TZ: Asia/Tokyo
+  client:
+    user: "${UID}:${GID}"
+    build: ./docker/client
+    volumes:
+      - .:/app
+      - ./tmp/.cargo:/cargo
+    ports:
+      - "7777:7777"
+    environment:
+      TZ: Asia/Tokyo
+      CARGO_HOME: /cargo
+      HOME: /tmp
+    depends_on:
+      - server
+  server:
+    user: "${UID}:${GID}"
+    build: ./docker/server
+    volumes:
+      - .:/app
+      - ./tmp/.cargo:/cargo
+    environment:
+      SECRET_KEY:
+      GOOGLE_CLIENT_ID:
+      GOOGLE_CLIENT_SECRET:
+      DATABASE_URL:
+      TZ: Asia/Tokyo
+      CARGO_HOME: /cargo
+      RUST_BACKTRACE: 1
+    depends_on:
+      - db
+volumes:
+  postgresql_data:
+    driver: local
