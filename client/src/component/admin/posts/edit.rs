@@ -1,5 +1,6 @@
 use crate::component::error;
 use crate::fetch;
+use crate::routes::{AdminRoute, AppRoute};
 use crate::utils;
 use common::dto::{Id, Post};
 use common::form::{PostErrors, PostForm};
@@ -72,7 +73,8 @@ impl Component for Model {
                 }
             }
             Msg::Updated => {
-                // TODO toast 出して一覧に戻る？
+                utils::toast("更新しました。");
+                utils::change_route(AppRoute::Admin(AdminRoute::Index));
                 true
             }
         }

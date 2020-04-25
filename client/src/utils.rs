@@ -1,14 +1,21 @@
+use crate::routes::AppRoute;
 use anyhow::Error;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
 use web_sys::{window, HtmlElement, Node, ScrollBehavior, ScrollToOptions};
 use yew::virtual_dom::VNode;
+use yew_router::agent::{RouteAgentDispatcher, RouteRequest};
+use yew_router::route::Route;
 
 pub fn alert(message: &str) {
     web_sys::window()
         .unwrap()
         .alert_with_message(message)
         .unwrap();
+}
+
+pub fn change_route(route: AppRoute) {
+    RouteAgentDispatcher::<()>::new().send(RouteRequest::ChangeRoute(Route::from(route)));
 }
 
 pub fn disable_buttons() {
