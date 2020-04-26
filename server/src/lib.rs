@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate diesel;
+
 use actix_identity::{CookieIdentityPolicy, IdentityService};
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use diesel::connection::Connection;
@@ -9,8 +12,10 @@ use thread_data::ThreadData;
 
 pub mod api;
 pub mod auth;
+pub mod common;
 pub mod errors;
 pub mod middleware;
+pub mod schema;
 pub mod thread_data;
 pub mod utils;
 

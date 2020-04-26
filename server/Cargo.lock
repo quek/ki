@@ -478,24 +478,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "common"
-version = "0.1.0"
-dependencies = [
- "actix-http",
- "actix-identity",
- "actix-web",
- "chrono",
- "diesel",
- "diesel-derive-enum",
- "futures",
- "js-sys",
- "serde",
- "serde_json",
- "wasm-bindgen",
- "web-sys",
-]
-
-[[package]]
 name = "copyless"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1460,14 +1442,15 @@ dependencies = [
 name = "server"
 version = "0.1.0"
 dependencies = [
+ "actix-http",
  "actix-identity",
  "actix-rt",
  "actix-service",
  "actix-web",
  "chrono",
- "common",
  "derive_more 0.15.0",
  "diesel",
+ "diesel-derive-enum",
  "env_logger",
  "futures",
  "lazy_static",
@@ -1804,8 +1787,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2cc57ce05287f8376e998cbddfb4c8cb43b84a7ec55cf4551d7c00eef317a47f"
 dependencies = [
  "cfg-if",
- "serde",
- "serde_json",
  "wasm-bindgen-macro",
 ]
 

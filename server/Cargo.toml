@@ -10,14 +10,15 @@ license = "MIT"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+actix-http = "1"
 actix-identity = "0.2"
 actix-rt = "1"
 actix-service = "1"
 actix-web = { version = "2", features = ["rustls"] }
 chrono = { version = "0.4", features = ["serde"] }
-common = { path = "../common" }
 derive_more = "0.15"
 diesel = { version = "1.4", features = ["postgres", "r2d2", "chrono", "64-column-tables"] }
+diesel-derive-enum = { version = "0.4", features = ["postgres"] }
 env_logger = "0.7"
 futures = "0.3"
 lazy_static = "1"

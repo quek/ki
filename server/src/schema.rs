@@ -1,6 +1,6 @@
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::common::types::*;
 
     posts (id) {
         id -> Int4,
@@ -15,7 +15,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::common::types::*;
 
     users (id) {
         id -> Int4,

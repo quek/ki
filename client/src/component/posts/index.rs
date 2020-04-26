@@ -1,7 +1,7 @@
+use crate::common::dto::Post;
 use crate::component::Link;
 use crate::fetch;
 use crate::routes::AppRoute;
-use common::dto::Post;
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 
 pub struct Model {

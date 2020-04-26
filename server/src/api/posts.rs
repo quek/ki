@@ -1,9 +1,9 @@
+use crate::common::dto::{Id, Post};
+use crate::common::types::PostStatus;
 use crate::errors::ServiceError;
+use crate::schema;
 use crate::thread_data::ThreadData;
 use actix_web::{web, HttpResponse};
-use common::dto::{Id, Post};
-use common::schema;
-use common::types::PostStatus;
 use diesel::prelude::*;
 
 pub async fn index(data: web::Data<ThreadData>) -> Result<HttpResponse, ServiceError> {

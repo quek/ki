@@ -1,11 +1,11 @@
+use crate::common::dto::User;
+use crate::common::types::UserStatus;
 use crate::errors::ServiceError;
 use crate::thread_data::ThreadData;
 use actix_service::{Service, Transform};
 use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::web::block;
 use actix_web::{Error, FromRequest, ResponseError};
-use common::dto::User;
-use common::types::UserStatus;
 use diesel::prelude::*;
 use diesel::PgConnection;
 use futures::future::{ok, Future, Ready};
@@ -66,7 +66,7 @@ where
             let (r, mut pl) = service_request.into_parts();
             let user = User::from_request(&r, &mut pl).await?;
             let result = block::<_, _, ServiceError>(move || {
-                use common::schema::users;
+                use crate::schema::users;
                 use diesel::dsl::{exists, select};
                 let conn: &PgConnection = &thread_data.pool.get().unwrap();
                 let exists = select(exists(

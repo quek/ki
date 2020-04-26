@@ -22,5 +22,5 @@ WORKDIR /app/server
 
 CMD ["/wait-for-it.sh", "db:5432", "--", \
      "systemfd", "--no-pid", "-s", "0.0.0.0:7778", "--", \
-     "cargo", "watch", "--watch", "../common", "--watch", ".", \
+     "cargo", "watch", "--watch", ".", \
      "-x", "run"]

@@ -1,7 +1,6 @@
+use crate::common::types::{PostStatus, UserStatus};
 #[cfg(target_arch = "x86_64")]
 use crate::schema::*;
-use crate::types::PostStatus;
-use crate::types::UserStatus;
 #[cfg(target_arch = "x86_64")]
 use actix_identity::Identity;
 #[cfg(target_arch = "x86_64")]

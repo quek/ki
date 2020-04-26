@@ -2,6 +2,7 @@
 use wasm_bindgen::prelude::*;
 
 mod app;
+mod common;
 mod component;
 mod fetch;
 mod global_state;

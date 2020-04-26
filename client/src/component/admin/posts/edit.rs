@@ -1,10 +1,10 @@
+use crate::common::dto::{Id, Post};
+use crate::common::form::{PostErrors, PostForm};
+use crate::common::types::PostStatus;
 use crate::component::error;
 use crate::fetch;
 use crate::routes::{AdminRoute, AppRoute};
 use crate::utils;
-use common::dto::{Id, Post};
-use common::form::{PostErrors, PostForm};
-use common::types::PostStatus;
 use web_sys::Event;
 use yew::{html, Component, ComponentLink, Html, Properties, ShouldRender};
 

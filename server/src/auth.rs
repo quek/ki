@@ -1,11 +1,11 @@
+use crate::common::dto::User;
+use crate::common::types::UserStatus;
 use crate::errors::ServiceError;
 use crate::thread_data::ThreadData;
 use actix_identity::Identity;
 use actix_web::client::Client;
 use actix_web::web;
 use actix_web::HttpResponse;
-use common::dto::User;
-use common::types::UserStatus;
 use diesel::prelude::*;
 use diesel::PgConnection;
 use serde::Deserialize;
@@ -96,7 +96,7 @@ pub async fn login_code(
         // println!("user_info {:?}", &x);
 
         let user = web::block(move || {
-            use common::schema::users;
+            use crate::schema::users;
             let conn: &PgConnection = &data.pool.get().unwrap();
             let user: User = users::table
                 .filter(users::email.eq(user_info.email))

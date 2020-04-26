@@ -41,10 +41,7 @@ module.exports = {
     }),
     new WasmPackPlugin({
       crateDirectory: ".",
-      extraArgs: "--no-typescript",
-      watchDirectories: [
-        path.resolve(__dirname, "../common")
-      ]
+      extraArgs: "--no-typescript"
     }),
     new webpack.HotModuleReplacementPlugin()
   ],

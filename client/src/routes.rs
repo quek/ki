@@ -1,5 +1,4 @@
-// use common::dto::Id;
-use common::dto::Id;
+use crate::common::dto::Id;
 use yew_router::Switch;
 
 #[derive(Switch, Debug, Clone)]
