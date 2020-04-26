@@ -39,6 +39,7 @@ impl Component for Model {
     fn view(&self) -> Html {
         html! {
           <>
+            <h1>{"記"}</h1>
             {for self.posts.iter().map(|post| self.view_post(post))}
           </>
         }
@@ -48,7 +49,7 @@ impl Component for Model {
 impl Model {
     fn view_post(&self, post: &Post) -> Html {
         html! {
-          <div>
+          <div class="posts">
             <h3>
               <Link route=AppRoute::PostsShow(post.id)>
                 {&post.title}
@@ -57,8 +58,6 @@ impl Model {
             <div>
               <i class="fas fa-upload"></i>
               {post.published_at.unwrap().format("%Y-%m-%d %H:%M:%S")}
-            </div>
-            <div>
               <i class="fas fa-history"></i>
               {post.updated_at.format("%Y-%m-%d %H:%M:%S")}
             </div>
