@@ -13,10 +13,10 @@ pub enum AppRoute {
 
 #[derive(Switch, Debug, Clone)]
 pub enum AdminRoute {
+    #[to = "/posts/new"]
+    PostsNew,
     #[to = "/posts/{id}/edit"]
     PostsEdit(Id),
-    #[to = "/bar"]
-    Bar,
     #[to = ""]
     Index,
 }

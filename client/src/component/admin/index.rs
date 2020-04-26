@@ -39,11 +39,11 @@ impl Component for Model {
     fn view(&self) -> Html {
         html! {
           <>
-            <p>{"管理画面"}</p>
-            {for self.posts.iter().map(|post| self.view_post(post))}
-            <Link route=AppRoute::Admin(AdminRoute::Bar)>
-              <i class="fas fa-camera"></i>{"Bar へ"}
+            <h1>{"記 管理画面"}</h1>
+            <Link route=AppRoute::Admin(AdminRoute::PostsNew)>
+                {"新規作成"}
             </Link>
+            {for self.posts.iter().map(|post| self.view_post(post))}
           </>
         }
     }

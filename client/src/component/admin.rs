@@ -2,7 +2,6 @@ use crate::component;
 use crate::routes::AdminRoute;
 use yew::{html, Component, ComponentLink, Html, Properties, ShouldRender};
 
-pub mod bar;
 pub mod header;
 pub mod index;
 pub mod posts;
@@ -48,8 +47,8 @@ impl Component for Model {
 impl Model {
     fn view_routes(&self) -> Html {
         match self.props.route {
+            AdminRoute::PostsNew => html! { <component::admin::posts::new::Model /> },
             AdminRoute::PostsEdit(id) => html! { <component::admin::posts::edit::Model id=id /> },
-            AdminRoute::Bar => html! { <component::admin::bar::Model /> },
             AdminRoute::Index => html! { <component::admin::index::Model /> },
         }
     }

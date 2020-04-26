@@ -69,7 +69,8 @@ pub async fn run() -> std::io::Result<()> {
                             .wrap(middleware::EnsureLogin)
                             .route("/posts/{id}/edit", web::get().to(api::admin::posts::edit))
                             .route("/posts/{id}", web::put().to(api::admin::posts::update))
-                            .route("/posts", web::get().to(api::admin::posts::index)),
+                            .route("/posts", web::get().to(api::admin::posts::index))
+                            .route("/posts", web::post().to(api::admin::posts::create)),
                     ),
             )
     });

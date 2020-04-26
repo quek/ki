@@ -15,7 +15,7 @@ use std::pin::Pin;
 
 pub type Id = i32;
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[cfg_attr(target_arch = "x86_64", derive(Identifiable, Queryable, Associations))]
 pub struct Post {
     pub id: Id,

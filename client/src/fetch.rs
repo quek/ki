@@ -33,6 +33,18 @@ impl FetchService {
         self.fetch(request, callback)
     }
 
+    pub fn post<IN, OUT>(&mut self, url: &str, post_data: IN, callback: Callback<OUT>) -> FetchTask
+    where
+        Json<IN>: Into<Text>,
+        Json<Result<OUT, Error>>: From<Text> + 'static,
+    {
+        let request = Request::post(url)
+            .header("Content-Type", "application/json")
+            .body(Json(post_data))
+            .unwrap();
+        self.fetch(request, callback)
+    }
+
     pub fn put<IN, OUT>(&mut self, url: &str, post_data: IN, callback: Callback<OUT>) -> FetchTask
     where
         Json<IN>: Into<Text>,
