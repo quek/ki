@@ -50,8 +50,16 @@ impl Component for Model {
                 html! {
                   <>
                     <Link route=AppRoute::Index>{"top"}</Link>
-                    <div>{&post.title}</div>
-                    {utils::markdown_node(&post.body)}
+                    <div  class="post">
+                      <h1>{&post.title}</h1>
+                      <div>
+                        <i class="fas fa-upload"></i>
+                        {post.published_at.unwrap().format("%Y-%m-%d %H:%M:%S")}
+                        <i class="fas fa-history"></i>
+                        {post.updated_at.format("%Y-%m-%d %H:%M:%S")}
+                      </div>
+                      {utils::markdown_node(&post.body)}
+                    </div>
                   </>
                 }
             }
