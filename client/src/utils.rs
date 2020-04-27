@@ -55,13 +55,48 @@ pub fn handle_unauthorized() -> () {
 }
 
 pub fn markdown(text: &str) -> String {
-    use pulldown_cmark::{html, Options, Parser};
+    use crate::prism::{highlight, languages};
+    use pulldown_cmark::{html, CodeBlockKind, Event, Options, Parser, Tag};
+
     let mut options = Options::empty();
     options.insert(Options::ENABLE_TABLES);
     options.insert(Options::ENABLE_FOOTNOTES);
     options.insert(Options::ENABLE_STRIKETHROUGH);
     options.insert(Options::ENABLE_TASKLISTS);
-    let parser = Parser::new_ext(text, options);
+    let mut lang: Option<String> = None;
+    let mut in_code = false;
+    let mut codes = String::new();
+    let parser = Parser::new_ext(text, options).map(|event| match event {
+        Event::Start(Tag::CodeBlock(CodeBlockKind::Fenced(x))) => {
+            lang = Some(x.to_string());
+            in_code = true;
+            Event::Text("".into())
+        }
+        Event::Start(Tag::CodeBlock(_)) => {
+            lang = None;
+            in_code = true;
+            Event::Text("".into())
+        }
+        Event::End(Tag::CodeBlock(_)) => {
+            in_code = false;
+            let html = highlight(
+                codes.clone(),
+                languages.get(lang.as_ref().unwrap_or(&"text".to_string()).to_string()),
+            );
+            codes = String::new();
+            lang = None;
+            Event::Html(format!("<pre><code>{}</code></pre>", html).into())
+        }
+        Event::Text(text) => {
+            if in_code {
+                codes += text.as_ref();
+                Event::Text("".into())
+            } else {
+                Event::Text(text)
+            }
+        }
+        _ => event,
+    });
     let mut html_output: String = String::with_capacity(text.len() * 3 / 2);
     html::push_html(&mut html_output, parser);
     html_output
