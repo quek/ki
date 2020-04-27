@@ -63,28 +63,36 @@ pub fn markdown(text: &str) -> String {
     options.insert(Options::ENABLE_FOOTNOTES);
     options.insert(Options::ENABLE_STRIKETHROUGH);
     options.insert(Options::ENABLE_TASKLISTS);
-    let mut lang: Option<String> = None;
     let mut in_code = false;
+    let mut lang: Option<String> = None;
     let mut codes = String::new();
     let parser = Parser::new_ext(text, options).map(|event| match event {
         Event::Start(Tag::CodeBlock(CodeBlockKind::Fenced(x))) => {
-            lang = Some(x.to_string());
             in_code = true;
+            lang = Some(x.to_string());
             Event::Text("".into())
         }
         Event::Start(Tag::CodeBlock(_)) => {
-            lang = None;
             in_code = true;
+            lang = None;
             Event::Text("".into())
         }
         Event::End(Tag::CodeBlock(_)) => {
+            web_sys::console::log_1(&format!("Event::End {:?}", &lang).into());
             in_code = false;
-            let html = highlight(
-                codes.clone(),
-                languages.get(lang.as_ref().unwrap_or(&"text".to_string()).to_string()),
-            );
-            codes = String::new();
+            // TODO languages.get がだめなら code.clone() を返すようにする
+            let html = match &lang {
+                Some(lang) => {
+                    if lang == "" {
+                        codes.clone()
+                    } else {
+                        highlight(codes.clone(), languages.get(lang.to_string()))
+                    }
+                }
+                _ => codes.clone(),
+            };
             lang = None;
+            codes = String::new();
             Event::Html(format!("<pre><code>{}</code></pre>", html).into())
         }
         Event::Text(text) => {
