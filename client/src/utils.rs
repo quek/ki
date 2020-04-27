@@ -86,7 +86,11 @@ pub fn markdown(text: &str) -> String {
                     if lang == "" {
                         codes.clone()
                     } else {
-                        highlight(codes.clone(), languages.get(lang.to_string()))
+                        highlight(
+                            codes.clone(),
+                            languages.get(lang.to_string()),
+                            lang.to_string(),
+                        )
                     }
                 }
                 _ => codes.clone(),

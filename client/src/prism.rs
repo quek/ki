@@ -8,5 +8,5 @@ extern "C" {
     #[wasm_bindgen(method, structural, indexing_getter)]
     pub fn get(this: &Language, prop: String) -> Language;
 
-    pub fn highlight(code: String, lang: Language) -> String;
+    pub fn highlight(code: String, grammar: Language, lang: String) -> String;
 }
