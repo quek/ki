@@ -63,12 +63,16 @@ pub async fn update(
         let conn: &PgConnection = &data.pool.get().unwrap();
         let id = params.into_inner();
         let form = form.into_inner();
-
-        let values: PostValues = form.into();
-        diesel::update(posts::table.filter(posts::id.eq(id)))
-            .set(values)
-            .execute(conn)?;
-        Ok(())
+        match form.validate() {
+            Ok(()) => {
+                let values: PostValues = form.into();
+                diesel::update(posts::table.filter(posts::id.eq(id)))
+                    .set(values)
+                    .execute(conn)?;
+                Ok(Ok(()))
+            }
+            Err(errors) => Ok(Err(errors)),
+        }
     })
     .await?;
     Ok(HttpResponse::Ok().json(result))
@@ -81,12 +85,16 @@ pub async fn create(
     let result = web::block(move || {
         let conn: &PgConnection = &data.pool.get().unwrap();
         let form = form.into_inner();
-
-        let values: PostValues = form.into();
-        diesel::insert_into(posts::table)
-            .values(values)
-            .execute(conn)?;
-        Ok(())
+        match form.validate() {
+            Ok(()) => {
+                let values: PostValues = form.into();
+                diesel::insert_into(posts::table)
+                    .values(values)
+                    .execute(conn)?;
+                Ok(Ok(()))
+            }
+            Err(errors) => Ok(Err(errors)),
+        }
     })
     .await?;
     Ok(HttpResponse::Ok().json(result))

@@ -9,7 +9,6 @@ use yew::{html, Callback, Component, ComponentLink, Html, Properties, ShouldRend
 pub struct Model {
     link: ComponentLink<Self>,
     props: Props,
-    errors: PostErrors,
 }
 
 pub enum Msg {
@@ -22,6 +21,7 @@ pub struct Props {
     pub post: Option<Post>,
     pub button_label: String,
     pub onsubmit: Callback<PostForm>,
+    pub errors: PostErrors,
 }
 
 impl Component for Model {
@@ -29,11 +29,7 @@ impl Component for Model {
     type Properties = Props;
 
     fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        Self {
-            link,
-            props,
-            errors: Default::default(),
-        }
+        Self { link, props }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
@@ -44,12 +40,12 @@ impl Component for Model {
                 web_sys::console::log_1(&format!("{:?}", &form).into());
                 match form.validate() {
                     Err(errors) => {
-                        self.errors = errors;
+                        self.props.errors = errors;
                         utils::scroll_to_error();
                         true
                     }
                     Ok(()) => {
-                        self.errors = PostErrors::default();
+                        self.props.errors = PostErrors::default();
                         self.props.onsubmit.emit(form);
                         true
                     }
@@ -65,12 +61,12 @@ impl Component for Model {
             <div>
               <label>{"タイトル"}</label>
               <input type="text" name="title" value=post.as_ref().map_or("", |x| &x.title) />
-              <error::Model message={&self.errors.title} />
+              <error::Model message={&self.props.errors.title} />
             </div>
             <div>
               <label>{"本文"}</label>
               <textarea name="body">{post.as_ref().map_or("", |x| &x.body)}</textarea>
-              <error::Model message={&self.errors.body} />
+              <error::Model message={&self.props.errors.body} />
             </div>
             <div>
               <label>{"ステータス"}</label>
@@ -86,7 +82,7 @@ impl Component for Model {
                   {"公開"}
                 </label>
               </div>
-              <error::Model message={&self.errors.status} />
+              <error::Model message={&self.props.errors.status} />
             </div>
             <button>{&self.props.button_label}</button>
           </form>

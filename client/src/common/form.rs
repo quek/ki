@@ -40,7 +40,7 @@ impl PostForm {
     }
 }
 
-#[derive(Debug, Default, Deserialize, Serialize, PartialEq)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq)]
 pub struct PostErrors {
     pub title: Option<String>,
     pub body: Option<String>,

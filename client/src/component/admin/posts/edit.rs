@@ -1,5 +1,5 @@
 use crate::common::dto::{Id, Post};
-use crate::common::form::PostForm;
+use crate::common::form::{PostErrors, PostForm};
 use crate::component::admin::posts::form;
 use crate::fetch;
 use crate::routes::{AdminRoute, AppRoute};
@@ -10,6 +10,7 @@ pub struct Model {
     link: ComponentLink<Self>,
     props: Props,
     post: Option<Post>,
+    errors: PostErrors,
     #[allow(dead_code)]
     fetch_task: fetch::FetchTask,
 }
@@ -17,6 +18,7 @@ pub struct Model {
 pub enum Msg {
     Post(Post),
     Submit(PostForm),
+    SubmitError(PostErrors),
     Updated,
 }
 
@@ -37,6 +39,7 @@ impl Component for Model {
             link,
             props,
             post: None,
+            errors: PostErrors::default(),
             fetch_task,
         }
     }
@@ -51,9 +54,17 @@ impl Component for Model {
                 self.fetch_task = fetch::FetchService::new().put(
                     &format!("/api/admin/posts/{}", self.props.id),
                     &form,
-                    self.link.callback(|_: ()| Msg::Updated),
+                    self.link
+                        .callback(|response: Result<(), PostErrors>| match response {
+                            Ok(()) => Msg::Updated,
+                            Err(errors) => Msg::SubmitError(errors),
+                        }),
                 );
                 false
+            }
+            Msg::SubmitError(errors) => {
+                self.errors = errors;
+                true
             }
             Msg::Updated => {
                 utils::toast("更新しました。");
@@ -70,7 +81,7 @@ impl Component for Model {
             Some(post) => html! {
               <>
                 <h1>{"編集"}</h1>
-                <form::Model button_label="更新", onsubmit=callback post=post />
+                <form::Model button_label="更新", onsubmit=callback post=post errors=&self.errors />
               </>
             },
         }
