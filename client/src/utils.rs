@@ -80,19 +80,11 @@ pub fn markdown(text: &str) -> String {
         Event::End(Tag::CodeBlock(_)) => {
             web_sys::console::log_1(&format!("Event::End {:?}", &lang).into());
             in_code = false;
-            // TODO languages.get がだめなら code.clone() を返すようにする
             let html = match &lang {
-                Some(lang) => {
-                    if lang == "" {
-                        codes.clone()
-                    } else {
-                        highlight(
-                            codes.clone(),
-                            languages.get(lang.to_string()),
-                            lang.to_string(),
-                        )
-                    }
-                }
+                Some(lang) => match languages.get(lang.to_string()) {
+                    Some(syntax) => highlight(codes.clone(), syntax, lang.to_string()),
+                    None => codes.clone(),
+                },
                 _ => codes.clone(),
             };
             lang = None;
