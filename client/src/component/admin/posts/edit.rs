@@ -2,7 +2,6 @@ use crate::common::dto::{Id, Post};
 use crate::common::form::{PostErrors, PostForm};
 use crate::component::admin::posts::form;
 use crate::fetch;
-use crate::routes::{AdminRoute, AppRoute};
 use crate::utils;
 use yew::{html, Component, ComponentLink, Html, Properties, ShouldRender};
 
@@ -68,7 +67,6 @@ impl Component for Model {
             }
             Msg::Updated => {
                 utils::toast("更新しました。");
-                utils::change_route(AppRoute::Admin(AdminRoute::Index));
                 true
             }
         }
@@ -81,7 +79,7 @@ impl Component for Model {
             Some(post) => html! {
               <>
                 <h1>{"編集"}</h1>
-                <form::Model button_label="更新", onsubmit=callback post=post errors=&self.errors />
+                <form::Model button_label="保存", onsubmit=callback post=post errors=&self.errors />
               </>
             },
         }
