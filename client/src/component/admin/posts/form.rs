@@ -1,5 +1,5 @@
-use crate::common::dto::Post;
 use crate::common::form::{PostErrors, PostForm};
+use crate::common::models::Post;
 use crate::common::types::PostStatus;
 use crate::component::error;
 use crate::utils;

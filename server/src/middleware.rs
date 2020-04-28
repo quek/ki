@@ -1,4 +1,4 @@
-use crate::common::dto::User;
+use crate::common::models::User;
 use crate::common::types::UserStatus;
 use crate::errors::ServiceError;
 use crate::thread_data::ThreadData;

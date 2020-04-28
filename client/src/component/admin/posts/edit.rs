@@ -1,5 +1,5 @@
-use crate::common::dto::{Id, Post};
 use crate::common::form::{PostErrors, PostForm};
+use crate::common::models::{Id, Post};
 use crate::component::admin::posts::form;
 use crate::fetch;
 use crate::utils;

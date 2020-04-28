@@ -1,4 +1,4 @@
-use crate::common::dto::Id;
+use crate::common::models::Id;
 use yew_router::Switch;
 
 #[derive(Switch, Debug, Clone)]

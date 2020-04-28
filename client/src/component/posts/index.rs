@@ -1,4 +1,4 @@
-use crate::common::dto::Post;
+use crate::common::models::Post;
 use crate::component::Link;
 use crate::fetch;
 use crate::routes::AppRoute;

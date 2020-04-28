@@ -1,4 +1,4 @@
-use crate::common::dto::{Id, Post};
+use crate::common::models::{Id, Post};
 use crate::common::types::PostStatus;
 use crate::errors::ServiceError;
 use crate::schema;
