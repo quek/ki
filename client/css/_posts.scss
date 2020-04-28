@@ -1,6 +1,10 @@
 .posts {
   > h3:first-child {
     margin-bottom: 0.2rem;
+    i {
+      color: #fc0;
+      margin-right: 0.5rem;
+    }
   }
   > div {
     font-size: 0.8rem;

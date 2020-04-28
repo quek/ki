@@ -1,4 +1,5 @@
 use crate::common::dto::Post;
+use crate::common::types::PostStatus;
 use crate::component::Link;
 use crate::fetch;
 use crate::routes::{AdminRoute, AppRoute};
@@ -52,12 +53,23 @@ impl Component for Model {
 impl Model {
     fn view_post(&self, post: &Post) -> Html {
         html! {
-          <div>
+          <div class="posts">
             <h3>
+              {if post.status == PostStatus::Published {
+                  html! { <i class="fas fa-upload"></i> }
+              } else {
+                  html! {""}
+              }}
               <Link route=AppRoute::Admin(AdminRoute::PostsEdit(post.id))>
                 {&post.title}
               </Link>
             </h3>
+            <div>
+              <i class="fas fa-upload"></i>
+              {post.published_at.map_or("-".to_string(), |x| x.format("%Y-%m-%d %H:%M:%S").to_string())}
+              <i class="fas fa-history"></i>
+              {post.updated_at.format("%Y-%m-%d %H:%M:%S")}
+            </div>
           </div>
         }
     }
