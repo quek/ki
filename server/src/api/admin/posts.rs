@@ -15,6 +15,7 @@ struct PostValues {
     title: String,
     body: String,
     status: PostStatus,
+    published_at: Option<chrono::NaiveDateTime>,
 }
 
 impl From<PostForm> for PostValues {
@@ -23,6 +24,7 @@ impl From<PostForm> for PostValues {
             title: form.title,
             body: form.body,
             status: PostStatus::from_str(&form.status).unwrap(),
+            published_at: None,
         }
     }
 }
@@ -65,7 +67,14 @@ pub async fn update(
         let form = form.into_inner();
         match form.validate() {
             Ok(()) => {
-                let values: PostValues = form.into();
+                let mut values: PostValues = form.into();
+                if values.status == PostStatus::Published {
+                    let post: Post = posts::table.filter(posts::id.eq(id)).first(conn)?;
+                    if post.published_at.is_none() {
+                        values.published_at = Some(chrono::Local::now().naive_local())
+                    }
+                }
+
                 diesel::update(posts::table.filter(posts::id.eq(id)))
                     .set(values)
                     .execute(conn)?;
