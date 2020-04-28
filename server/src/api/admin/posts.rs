@@ -31,8 +31,8 @@ pub async fn index(data: web::Data<ThreadData>) -> Result<HttpResponse, ServiceE
     let result: Vec<Post> = web::block(move || {
         let conn: &PgConnection = &data.pool.get().unwrap();
         let result = posts::table
-            .order(posts::created_at.desc())
-            .limit(20)
+            .order(posts::updated_at.desc())
+            .limit(50)
             .load(conn)?;
         Ok(result)
     })
