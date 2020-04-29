@@ -1,4 +1,4 @@
-form.std {
+form {
   margin-top: 5px;
   margin-bottom: 5px;
   input[type='text'],
@@ -36,21 +36,34 @@ form.std {
     padding: 5px 10px;
   }
 
-  > div {
-    display: grid;
-    grid-template-columns: 10rem 1fr;
-    grid-template-areas: 'label input' 'label error';
-    > label {
-      grid-area: label;
-      text-align: right;
-      margin: 0.8rem 0.5rem 0.5rem 0;
+  &.std {
+    > div {
+      display: grid;
+      grid-template-columns: 10rem 1fr;
+      grid-template-areas: 'label input' 'label error';
+      > label {
+        grid-area: label;
+        text-align: right;
+        margin: 0.8rem 0.5rem 0.5rem 0;
+      }
+      > input, > textarea, > select {
+        grid-area: input;
+      }
+      > div.error {
+        grid-area: error;
+        margin: -0.25rem 0 0.5rem 0.5rem;
+      }
     }
-    > input, > textarea, > select {
-      grid-area: input;
-    }
-    > div.error {
-      grid-area: error;
-      margin: -0.25rem 0 0.5rem 0.5rem;
+  }
+
+  &.post {
+    > div {
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: 1fr 1fr;
+      input[type='text'], textarea {
+        width: 100%;
+      }
     }
   }
 }

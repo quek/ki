@@ -4,15 +4,17 @@ use crate::common::types::PostStatus;
 use crate::component::error;
 use crate::utils;
 use web_sys::Event;
-use yew::{html, Callback, Component, ComponentLink, Html, Properties, ShouldRender};
+use yew::{html, Callback, Component, ComponentLink, Html, InputData, Properties, ShouldRender};
 
 pub struct Model {
     link: ComponentLink<Self>,
     props: Props,
+    body: String,
 }
 
 pub enum Msg {
     Submit(Event),
+    Body(InputData),
 }
 
 #[derive(Clone, Properties)]
@@ -29,7 +31,11 @@ impl Component for Model {
     type Properties = Props;
 
     fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        Self { link, props }
+        let body = props
+            .post
+            .as_ref()
+            .map_or("".to_string(), |x| x.body.to_string());
+        Self { link, props, body }
     }
 
     fn change(&mut self, props: Self::Properties) -> ShouldRender {
@@ -56,38 +62,45 @@ impl Component for Model {
                     }
                 }
             }
+            Msg::Body(input_data) => {
+                self.body = input_data.value;
+                true
+            }
         }
     }
 
     fn view(&self) -> Html {
         let post = &self.props.post;
+        let oninput = self.link.callback(|event| Msg::Body(event));
         html! {
-          <form class="std" onsubmit=self.link.callback(|event| Msg::Submit(event))>
+          <form class="post" onsubmit=self.link.callback(|input_data| Msg::Submit(input_data))>
             <div>
-              <label>{"タイトル"}</label>
-              <input type="text" name="title" value=post.as_ref().map_or("", |x| &x.title) />
-              <error::Model message={&self.props.errors.title} />
-            </div>
-            <div>
-              <label>{"本文"}</label>
-              <textarea name="body">{post.as_ref().map_or("", |x| &x.body)}</textarea>
-              <error::Model message={&self.props.errors.body} />
-            </div>
-            <div>
-              <label>{"ステータス"}</label>
               <div>
-                <label>
-                  <input type="radio" name="status" value=PostStatus::Draft
-                         checked={post.as_ref().map_or(true, |x| x.status == PostStatus::Draft)} />
-                  {"下書き"}
-                </label>
-                <label>
-                  <input type="radio" name="status" value=PostStatus::Published
-                         checked={post.as_ref().map_or(false, |x| x.status == PostStatus::Published)} />
-                  {"公開"}
-                </label>
+                <div>
+                  <input type="text" name="title" value=post.as_ref().map_or("", |x| &x.title) />
+                  <error::Model message={&self.props.errors.title} />
+                </div>
+                <div>
+                  <textarea name="body" oninput=oninput>{post.as_ref().map_or("", |x| &x.body)}</textarea>
+                  <error::Model message={&self.props.errors.body} />
+                </div>
+                <div>
+                  <div>
+                    <label>
+                      <input type="radio" name="status" value=PostStatus::Draft
+                             checked={post.as_ref().map_or(true, |x| x.status == PostStatus::Draft)} />
+                      {"下書き"}
+                    </label>
+                    <label>
+                      <input type="radio" name="status" value=PostStatus::Published
+                             checked={post.as_ref().map_or(false, |x| x.status == PostStatus::Published)} />
+                      {"公開"}
+                    </label>
+                  </div>
+                  <error::Model message={&self.props.errors.status} />
+                </div>
               </div>
-              <error::Model message={&self.props.errors.status} />
+              {utils::markdown_node(&self.body)}
             </div>
             <button>{&self.props.button_label}</button>
           </form>
