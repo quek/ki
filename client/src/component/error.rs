@@ -14,16 +14,19 @@ pub struct Props {
 impl Component for Model {
     type Message = Msg;
     type Properties = Props;
+
     fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
         Self {
             message: props.message,
         }
     }
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
-        true
-    }
+
     fn change(&mut self, props: Self::Properties) -> ShouldRender {
         self.message = props.message;
+        true
+    }
+
+    fn update(&mut self, _: Self::Message) -> ShouldRender {
         true
     }
 

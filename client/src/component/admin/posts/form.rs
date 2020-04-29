@@ -4,12 +4,16 @@ use crate::common::types::PostStatus;
 use crate::component::error;
 use crate::utils;
 use web_sys::Event;
-use yew::{html, Callback, Component, ComponentLink, Html, InputData, Properties, ShouldRender};
+use web_sys::HtmlInputElement;
+use yew::{
+    html, Callback, Component, ComponentLink, Html, InputData, NodeRef, Properties, ShouldRender,
+};
 
 pub struct Model {
     link: ComponentLink<Self>,
     props: Props,
     body: String,
+    title_ref: NodeRef,
 }
 
 pub enum Msg {
@@ -35,12 +39,25 @@ impl Component for Model {
             .post
             .as_ref()
             .map_or("".to_string(), |x| x.body.to_string());
-        Self { link, props, body }
+        Self {
+            link,
+            props,
+            body,
+            title_ref: NodeRef::default(),
+        }
     }
 
     fn change(&mut self, props: Self::Properties) -> ShouldRender {
         self.props = props;
         true
+    }
+
+    fn rendered(&mut self, first_render: bool) {
+        if first_render {
+            if let Some(x) = self.title_ref.cast::<HtmlInputElement>() {
+                x.focus().unwrap();
+            }
+        }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
@@ -77,7 +94,8 @@ impl Component for Model {
             <div>
               <div>
                 <div>
-                  <input type="text" name="title" value=post.as_ref().map_or("", |x| &x.title) />
+                  <input type="text" name="title" value=post.as_ref().map_or("", |x| &x.title)
+                         ref=self.title_ref.clone() />
                   <error::Model message={&self.props.errors.title} />
                 </div>
                 <div>

@@ -24,6 +24,10 @@ impl Component for Model {
         }
     }
 
+    fn change(&mut self, _: Self::Properties) -> ShouldRender {
+        false
+    }
+
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
             Msg::Login(event) => {

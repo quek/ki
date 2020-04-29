@@ -13,6 +13,10 @@ impl Component for Model {
         Self {}
     }
 
+    fn change(&mut self, _: Self::Properties) -> ShouldRender {
+        false
+    }
+
     fn update(&mut self, _msg: Self::Message) -> ShouldRender {
         false
     }
