@@ -2,7 +2,6 @@ use crate::common::models::{Id, Post};
 use crate::component::Link;
 use crate::fetch;
 use crate::routes::AppRoute;
-use crate::utils;
 use yew::{html, Component, ComponentLink, Html, Properties, ShouldRender};
 
 pub struct Model {
@@ -58,7 +57,7 @@ impl Component for Model {
                         <i class="fas fa-history"></i>
                         {post.updated_at.format("%Y-%m-%d %H:%M:%S")}
                       </div>
-                      {utils::markdown_node(&post.body)}
+                      {crate::markdown::node(&post.body)}
                     </div>
                   </>
                 }

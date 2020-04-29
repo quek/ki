@@ -100,7 +100,7 @@ impl Component for Model {
                   <error::Model message={&self.props.errors.status} />
                 </div>
               </div>
-              {utils::markdown_node(&self.body)}
+              {crate::markdown::node(&self.body)}
             </div>
             <button>{&self.props.button_label}</button>
           </form>

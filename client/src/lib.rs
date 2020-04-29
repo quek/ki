@@ -6,6 +6,7 @@ mod common;
 mod component;
 mod fetch;
 mod global_state;
+mod markdown;
 mod prism;
 mod routes;
 mod utils;
