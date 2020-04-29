@@ -6,10 +6,7 @@ form {
   input[type='date'],
   input[type='number'],
   input[type='search'] {
-    font-size: 1.2em;
     width: 500px;
-    margin-top: 5px;
-    margin-bottom: 5px;
     padding: 5px;
   }
   input[type='checkbox'],
@@ -18,21 +15,18 @@ form {
     width: 25px;
     vertical-align: sub;
   }
-  select {
+  input, textarea, button, select {
     font-size: 1.2em;
-    margin-top: 5px;
-    margin-bottom: 5px;
+    margin-top: 0.3rem;
+    margin-bottom: 0.3rem;
   }
   textarea {
-    font-size: 1.4em;
     height: 400px;
     padding: 5px;
     width: 90%;
   }
   button {
     font-size: 1.09em;
-    margin-top: 5px;
-    margin-bottom: 5px;
     padding: 5px 10px;
   }
 
@@ -63,6 +57,15 @@ form {
       grid-template-columns: 1fr 1fr;
       input[type='text'], textarea {
         width: 100%;
+      }
+      textarea {
+        font-size: 0.8em;
+      }
+      > div {
+        overflow-y: scroll;
+        &::-webkit-scrollbar {
+          display:none;
+        }
       }
     }
   }
