@@ -1,6 +1,5 @@
 use crate::component;
 use crate::routes::AppRoute;
-use crate::utils;
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew_router::router::Router;
 
@@ -25,20 +24,23 @@ impl Component for Model {
     }
 
     fn view(&self) -> Html {
-        let render = Router::render(|switch: AppRoute| match switch {
-            AppRoute::Index => {
-                html! {
-                  <component::index::Model />
+        let render = Router::render(|switch: AppRoute| {
+            web_sys::console::log_1(&format!("route {:?} !!!!!!!!!!!!!!!!!!", &switch).into());
+            match switch {
+                AppRoute::Index => {
+                    html! {
+                      <component::index::Model />
+                    }
                 }
-            }
-            AppRoute::PostsShow(id) => {
-                html! {
-                <component::posts::show::Model id=id />
+                AppRoute::PostsShow(id) => {
+                    html! {
+                    <component::posts::show::Model id=id />
+                    }
                 }
-            }
-            AppRoute::Admin(route) => {
-                html! {
-                  <component::admin::Model route=route query=utils::query_string() />
+                AppRoute::Admin(route) => {
+                    html! {
+                      <component::admin::Model route=route />
+                    }
                 }
             }
         });

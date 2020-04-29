@@ -5,7 +5,7 @@ use crate::component::Link;
 use crate::fetch;
 use crate::routes::{AdminRoute, AppRoute};
 use crate::utils;
-use yew::{html, Callback, Component, ComponentLink, Html, Properties, ShouldRender};
+use yew::{html, Callback, Component, ComponentLink, Html, ShouldRender};
 
 pub struct Model {
     posts: Vec<Post>,
@@ -21,17 +21,12 @@ pub enum Msg {
     Page(i64),
 }
 
-#[derive(Clone, Properties)]
-pub struct Props {
-    pub query: String,
-}
-
 impl Component for Model {
     type Message = Msg;
-    type Properties = Props;
+    type Properties = ();
 
-    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        let query = serde_qs::from_str(&props.query).unwrap_or(PostQuery::default());
+    fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
+        let query = serde_qs::from_str(&utils::query_string()).unwrap_or(PostQuery::default());
         let pager_callback = link.callback(move |page: i64| Msg::Page(page));
         let callback = link.callback(|posts: (Vec<Post>, i64)| Msg::Posts(posts));
         let fetch_task = fetch::FetchService::new().get(
@@ -50,9 +45,8 @@ impl Component for Model {
         }
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.query = serde_qs::from_str(&props.query).unwrap_or(PostQuery::default());
-        true
+    fn change(&mut self, _props: Self::Properties) -> ShouldRender {
+        false
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
@@ -65,7 +59,9 @@ impl Component for Model {
             Msg::Page(page) => {
                 self.query.page = page;
                 let query_string = serde_qs::to_string(&self.query).unwrap();
+                web_sys::console::log_1(&format!("{:?}", &query_string).into());
                 utils::change_route_with_query(AppRoute::Admin(AdminRoute::Posts), &query_string);
+                // TODO reload
                 false
             }
         }
