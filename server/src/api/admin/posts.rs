@@ -96,7 +96,10 @@ pub async fn create(
         let form = form.into_inner();
         match form.validate() {
             Ok(()) => {
-                let values: PostValues = form.into();
+                let mut values: PostValues = form.into();
+                if values.status == PostStatus::Published {
+                    values.published_at = Some(chrono::Local::now().naive_local())
+                }
                 diesel::insert_into(posts::table)
                     .values(values)
                     .execute(conn)?;
