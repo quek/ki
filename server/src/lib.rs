@@ -15,6 +15,7 @@ pub mod auth;
 pub mod common;
 pub mod errors;
 pub mod middleware;
+pub mod paginate;
 pub mod schema;
 pub mod thread_data;
 pub mod utils;

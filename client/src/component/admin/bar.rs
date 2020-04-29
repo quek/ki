@@ -40,7 +40,7 @@ impl Component for Model {
           <>
             <p>{"Bar です"}</p>
             <p><button onclick=onclick>{"Hi"}</button></p>
-            <AppRouterButton route=AppRoute::Admin(AdminRoute::Index)>
+            <AppRouterButton route=AppRoute::Admin(AdminRoute::Posts)>
               {"index へ"}
             </AppRouterButton>
           </>

@@ -27,7 +27,7 @@ impl Component for Model {
           <div id="header">
             <Link route=AppRoute::Index>{"トップ"}</Link>
             {" "}
-            <Link route=AppRoute::Admin(AdminRoute::Index)>{"記事"}</Link>
+            <Link route=AppRoute::Admin(AdminRoute::Posts)>{"記事"}</Link>
           </div>
         }
     }

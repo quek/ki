@@ -17,6 +17,6 @@ pub enum AdminRoute {
     PostsNew,
     #[to = "/posts/{id}/edit"]
     PostsEdit(Id),
-    #[to = ""]
-    Index,
+    #[to = "/posts"]
+    Posts,
 }

@@ -17,6 +17,12 @@ pub fn change_route(route: AppRoute) {
     RouteAgentDispatcher::<()>::new().send(RouteRequest::ChangeRoute(Route::from(route)));
 }
 
+pub fn change_route_with_query(route: AppRoute, query: &str) {
+    let mut x = Route::from(route);
+    x.route = format!("{}?{}", x.route, query);
+    RouteAgentDispatcher::<()>::new().send(RouteRequest::ChangeRoute(x));
+}
+
 pub fn disable_buttons() {
     let document = web_sys::window().unwrap().document().unwrap();
     let node_list = document
@@ -51,6 +57,15 @@ pub fn handle_api_error(error: Option<Error>) -> bool {
 pub fn handle_unauthorized() -> () {
     alert("ログインしてください。");
     set_location("/login");
+}
+
+pub fn query_string() -> String {
+    web_sys::window()
+        .unwrap()
+        .location()
+        .search()
+        .unwrap_or("".to_string())
+        .replace("?", "")
 }
 
 pub fn scroll_to_error() {

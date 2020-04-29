@@ -1,42 +1,72 @@
-use crate::common::models::Post;
+use crate::common::models::{Post, PostQuery, PER_PAGE};
 use crate::common::types::PostStatus;
+use crate::component::pager;
 use crate::component::Link;
 use crate::fetch;
 use crate::routes::{AdminRoute, AppRoute};
-use yew::{html, Component, ComponentLink, Html, ShouldRender};
+use crate::utils;
+use yew::{html, Callback, Component, ComponentLink, Html, Properties, ShouldRender};
 
 pub struct Model {
     posts: Vec<Post>,
+    total_count: i64,
+    query: PostQuery,
+    pager_callback: Callback<i64>,
     #[allow(dead_code)]
     fetch_task: fetch::FetchTask,
 }
 
 pub enum Msg {
-    Posts(Vec<Post>),
+    Posts((Vec<Post>, i64)),
+    Page(i64),
+}
+
+#[derive(Clone, Properties)]
+pub struct Props {
+    pub query: String,
 }
 
 impl Component for Model {
     type Message = Msg;
-    type Properties = ();
+    type Properties = Props;
 
-    fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
-        let callback = link.callback(|posts: Vec<Post>| Msg::Posts(posts));
-        let fetch_task = fetch::FetchService::new().get("/api/admin/posts", callback);
+    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
+        let query = serde_qs::from_str(&props.query).unwrap_or(PostQuery::default());
+        let pager_callback = link.callback(move |page: i64| Msg::Page(page));
+        let callback = link.callback(|posts: (Vec<Post>, i64)| Msg::Posts(posts));
+        let fetch_task = fetch::FetchService::new().get(
+            &format!(
+                "/api/admin/posts?{}",
+                serde_qs::to_string(&query).unwrap_or("".to_string())
+            ),
+            callback,
+        );
         Self {
             posts: vec![],
+            total_count: 0,
+            query,
+            pager_callback,
             fetch_task,
         }
     }
 
-    fn change(&mut self, _: Self::Properties) -> ShouldRender {
-        false
+    fn change(&mut self, props: Self::Properties) -> ShouldRender {
+        self.query = serde_qs::from_str(&props.query).unwrap_or(PostQuery::default());
+        true
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
-            Msg::Posts(posts) => {
+            Msg::Posts((posts, total_count)) => {
                 self.posts = posts;
+                self.total_count = total_count;
                 true
+            }
+            Msg::Page(page) => {
+                self.query.page = page;
+                let query_string = serde_qs::to_string(&self.query).unwrap();
+                utils::change_route_with_query(AppRoute::Admin(AdminRoute::Posts), &query_string);
+                false
             }
         }
     }
@@ -49,6 +79,12 @@ impl Component for Model {
                 {"新規作成"}
             </Link>
             {for self.posts.iter().map(|post| self.view_post(post))}
+            <pager::Model
+              page={self.query.page}
+              total={self.total_count}
+              per_page={PER_PAGE}
+              callback={self.pager_callback.clone()}
+              />
           </>
         }
     }

@@ -107,7 +107,9 @@ pub async fn login_code(
         .await?;
 
         identity.remember(serde_json::to_string(&user).unwrap());
-        Ok(HttpResponse::Found().header("Location", "/admin").finish())
+        Ok(HttpResponse::Found()
+            .header("Location", "/admin/posts")
+            .finish())
     } else {
         Err(ServiceError::Unauthorized)
     }

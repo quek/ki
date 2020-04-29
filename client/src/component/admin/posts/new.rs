@@ -54,7 +54,7 @@ impl Component for Model {
             }
             Msg::Created => {
                 utils::toast("登録しました。");
-                utils::change_route(AppRoute::Admin(AdminRoute::Index));
+                utils::change_route(AppRoute::Admin(AdminRoute::Posts));
                 true
             }
         }
@@ -63,10 +63,7 @@ impl Component for Model {
     fn view(&self) -> Html {
         let callback = self.link.callback(|form: PostForm| Msg::Submit(form));
         html! {
-          <>
-            <h1>{"新規"}</h1>
-            <form::Model button_label="登録", onsubmit=callback errors=&self.errors />
-          </>
+          <form::Model button_label="登録", onsubmit=callback errors=&self.errors />
         }
     }
 }

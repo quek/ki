@@ -15,6 +15,7 @@ pub enum Msg {}
 #[derive(Clone, Properties)]
 pub struct Props {
     pub route: AdminRoute,
+    pub query: String,
 }
 
 impl Component for Model {
@@ -49,7 +50,9 @@ impl Model {
         match self.props.route {
             AdminRoute::PostsNew => html! { <component::admin::posts::new::Model /> },
             AdminRoute::PostsEdit(id) => html! { <component::admin::posts::edit::Model id=id /> },
-            AdminRoute::Index => html! { <component::admin::index::Model /> },
+            AdminRoute::Posts => {
+                html! { <component::admin::index::Model query=self.props.query.clone() /> }
+            }
         }
     }
 }

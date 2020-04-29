@@ -1,7 +1,8 @@
 use crate::common::form::PostForm;
-use crate::common::models::{Id, Post};
+use crate::common::models::{Id, Post, PostQuery, PER_PAGE};
 use crate::common::types::PostStatus;
 use crate::errors::ServiceError;
+use crate::paginate::Paginate;
 use crate::schema::posts;
 use crate::thread_data::ThreadData;
 use actix_web::{web, HttpResponse};
@@ -29,13 +30,19 @@ impl From<PostForm> for PostValues {
     }
 }
 
-pub async fn index(data: web::Data<ThreadData>) -> Result<HttpResponse, ServiceError> {
-    let result: Vec<Post> = web::block(move || {
+pub async fn index(
+    query: web::Query<PostQuery>,
+    data: web::Data<ThreadData>,
+) -> Result<HttpResponse, ServiceError> {
+    let result: (Vec<Post>, i64) = web::block(move || {
+        let query = query.into_inner();
+        let page = std::cmp::max(query.page, 1);
         let conn: &PgConnection = &data.pool.get().unwrap();
         let result = posts::table
             .order(posts::updated_at.desc())
-            .limit(50)
-            .load(conn)?;
+            .paginate(page)
+            .per_page(PER_PAGE)
+            .load_and_count::<Post>(conn)?;
         Ok(result)
     })
     .await?;

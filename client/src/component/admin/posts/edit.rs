@@ -81,10 +81,7 @@ impl Component for Model {
         match &self.post {
             None => html! { "" },
             Some(post) => html! {
-              <>
-                <h1>{"編集"}</h1>
-                <form::Model button_label="保存", onsubmit=callback post=post errors=&self.errors />
-              </>
+              <form::Model button_label="保存", onsubmit=callback post=post errors=&self.errors />
             },
         }
     }

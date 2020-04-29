@@ -1,5 +1,6 @@
 use crate::component;
 use crate::routes::AppRoute;
+use crate::utils;
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew_router::router::Router;
 
@@ -19,7 +20,7 @@ impl Component for Model {
         false
     }
 
-    fn update(&mut self, _msg: Self::Message) -> ShouldRender {
+    fn update(&mut self, _: Self::Message) -> ShouldRender {
         false
     }
 
@@ -37,7 +38,7 @@ impl Component for Model {
             }
             AppRoute::Admin(route) => {
                 html! {
-                  <component::admin::Model route=route />
+                  <component::admin::Model route=route query=utils::query_string() />
                 }
             }
         });

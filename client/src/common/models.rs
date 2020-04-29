@@ -13,6 +13,8 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "x86_64")]
 use std::pin::Pin;
 
+pub const PER_PAGE: i64 = 2;
+
 pub type Id = i32;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -25,6 +27,11 @@ pub struct Post {
     pub published_at: Option<chrono::NaiveDateTime>,
     pub created_at: chrono::NaiveDateTime,
     pub updated_at: chrono::NaiveDateTime,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize)]
+pub struct PostQuery {
+    pub page: i64,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
