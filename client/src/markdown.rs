@@ -37,16 +37,25 @@ fn text(text: &str) -> String {
         Event::End(Tag::CodeBlock(_)) => {
             web_sys::console::log_1(&format!("Event::End {:?}", &lang).into());
             in_code = false;
+            let mut code_class = None;
             let html = match &lang {
                 Some(lang) => match languages.get(lang.to_string()) {
-                    Some(syntax) => highlight(codes.clone(), syntax, lang.to_string()),
+                    Some(syntax) => {
+                        code_class = Some(format!("{}-language", lang).replace("\"", "&quot;"));
+                        highlight(codes.clone(), syntax, lang.to_string())
+                    }
                     None => codes.clone(),
                 },
                 _ => codes.clone(),
             };
             lang = None;
             codes = String::new();
-            Event::Html(format!("<pre><code>{}</code></pre>", html).into())
+            match code_class {
+                Some(class) => Event::Html(
+                    format!("<pre><code class=\"{}\">{}</code></pre>", class, html).into(),
+                ),
+                _ => Event::Html(format!("<pre><code>{}</code></pre>", html).into()),
+            }
         }
         Event::Text(text) => {
             if in_code {
