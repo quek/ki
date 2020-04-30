@@ -95,6 +95,14 @@ pub fn set_location(url: &str) -> () {
     window.location().set_href(url).unwrap();
 }
 
+pub fn set_title(title: &str) {
+    web_sys::window()
+        .unwrap()
+        .document()
+        .unwrap()
+        .set_title(title);
+}
+
 pub fn toast(message: &str) {
     let document = web_sys::window().unwrap().document().unwrap();
     if let Some(toast) = document.get_element_by_id("toast") {

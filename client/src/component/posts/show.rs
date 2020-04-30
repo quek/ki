@@ -1,7 +1,7 @@
 use crate::common::models::{Id, Post};
 use crate::component::Link;
-use crate::fetch;
 use crate::routes::AppRoute;
+use crate::{fetch, utils};
 use yew::{html, Component, ComponentLink, Html, Properties, ShouldRender};
 
 pub struct Model {
@@ -50,6 +50,7 @@ impl Component for Model {
         match self.post {
             None => html! { "" },
             Some(ref post) => {
+                utils::set_title(&post.title);
                 html! {
                   <>
                     <Link route=AppRoute::Index>{"top"}</Link>

@@ -1,5 +1,5 @@
-use crate::component;
 use crate::routes::AppRoute;
+use crate::{component, utils};
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew_router::router::Router;
 
@@ -28,6 +28,7 @@ impl Component for Model {
             web_sys::console::log_1(&format!("route {:?} !!!!!!!!!!!!!!!!!!", &switch).into());
             match switch {
                 AppRoute::Index => {
+                    utils::set_title("記");
                     html! {
                       <component::index::Model />
                     }
@@ -38,6 +39,7 @@ impl Component for Model {
                     }
                 }
                 AppRoute::Admin(route) => {
+                    utils::set_title("管理画面");
                     html! {
                       <component::admin::Model route=route />
                     }
