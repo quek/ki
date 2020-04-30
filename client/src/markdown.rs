@@ -35,7 +35,6 @@ fn text(text: &str) -> String {
             Event::Text("".into())
         }
         Event::End(Tag::CodeBlock(_)) => {
-            web_sys::console::log_1(&format!("Event::End {:?}", &lang).into());
             in_code = false;
             let mut code_class = None;
             let html = match &lang {
