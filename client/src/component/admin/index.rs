@@ -8,6 +8,7 @@ use crate::utils;
 use yew::{html, Callback, Component, ComponentLink, Html, ShouldRender};
 
 pub struct Model {
+    link: ComponentLink<Self>,
     posts: Vec<Post>,
     total_count: i64,
     query: PostQuery,
@@ -28,15 +29,9 @@ impl Component for Model {
     fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
         let query = serde_qs::from_str(&utils::query_string()).unwrap_or(PostQuery::default());
         let pager_callback = link.callback(move |page: i64| Msg::Page(page));
-        let callback = link.callback(|posts: (Vec<Post>, i64)| Msg::Posts(posts));
-        let fetch_task = fetch::FetchService::new().get(
-            &format!(
-                "/api/admin/posts?{}",
-                serde_qs::to_string(&query).unwrap_or("".to_string())
-            ),
-            callback,
-        );
+        let fetch_task = fetch_posts(&query, &link);
         Self {
+            link,
             posts: vec![],
             total_count: 0,
             query,
@@ -58,10 +53,9 @@ impl Component for Model {
             }
             Msg::Page(page) => {
                 self.query.page = page;
+                self.fetch_task = fetch_posts(&self.query, &self.link);
                 let query_string = serde_qs::to_string(&self.query).unwrap();
-                web_sys::console::log_1(&format!("{:?}", &query_string).into());
                 utils::change_route_with_query(AppRoute::Admin(AdminRoute::Posts), &query_string);
-                // TODO reload
                 false
             }
         }
@@ -109,4 +103,13 @@ impl Model {
           </div>
         }
     }
+}
+
+fn fetch_posts(query: &PostQuery, link: &ComponentLink<Model>) -> fetch::FetchTask {
+    let callback = link.callback(|posts: (Vec<Post>, i64)| Msg::Posts(posts));
+    let url = &format!(
+        "/api/admin/posts?{}",
+        serde_qs::to_string(&query).unwrap_or("".to_string())
+    );
+    fetch::FetchService::new().get(url, callback)
 }
