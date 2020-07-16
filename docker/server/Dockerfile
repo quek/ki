@@ -14,6 +14,8 @@ RUN apt update && apt install -y libpq-dev postgresql-client-12
 RUN cargo install systemfd cargo-watch && \
     cargo install diesel_cli --no-default-features --features postgres
 
+RUN rustup component add rls rust-analysis rust-src
+RUN rustup component add rustfmt
 
 # see https://docs.docker.com/compose/startup-order/
 ADD wait-for-it.sh /

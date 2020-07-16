@@ -15,7 +15,7 @@ services:
     build: ./docker/client
     volumes:
       - .:/app
-      - ./tmp/.cargo:/cargo
+      - ~/.cargo:/cargo
     ports:
       - "7777:7777"
     environment:
@@ -29,7 +29,7 @@ services:
     build: ./docker/server
     volumes:
       - .:/app
-      - ./tmp/.cargo:/cargo
+      - ~/.cargo:/cargo
     environment:
       SECRET_KEY:
       REDIRECT_URL:

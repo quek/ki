@@ -8,7 +8,7 @@ all:
 release-build:
 	docker exec -it ki_client_1 yarn release
 	docker exec -it ki_server_1 cargo build --release
-	docker cp ki_server_1:/app/server/target/release/server ./production/server/app
+	docker cp ki_server_1:/app/target/release/server ./production/server/app
 	docker cp ki_server_1:/usr/local/cargo/bin/diesel ./production/server/app
 	cp -a ./client/dist ./production/web
 	cp -a ./server/migrations ./production/server/app
