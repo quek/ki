@@ -25,3 +25,6 @@ clean-all: clean
 
 migration-run:
 	docker exec -it ki_server_1 diesel migration run
+
+psql:
+	docker exec -it ki_db_1 psql -U ki ki_development

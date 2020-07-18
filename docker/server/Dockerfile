@@ -1,4 +1,4 @@
-FROM  rust:1.42.0-slim-buster
+FROM rust:latest
 
 RUN apt update && apt install -y locales
 
@@ -25,4 +25,5 @@ WORKDIR /app/server
 CMD ["/wait-for-it.sh", "db:5432", "--", \
      "systemfd", "--no-pid", "-s", "0.0.0.0:7778", "--", \
      "cargo", "watch", "--watch", ".", \
+     "--ignore", "src/generated", \
      "-x", "run"]
