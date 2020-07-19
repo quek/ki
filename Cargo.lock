@@ -344,7 +344,7 @@ checksum = "cff77d8686867eceff3105329d4698d96c2391c176d5d03adc90c7389162b5b8"
 [[package]]
 name = "arysn"
 version = "0.1.0"
-source = "git+https://github.com/quek/arysn?branch=main#9ccd77f7b653da37d75e0f03fe726083a690bf3b"
+source = "git+https://github.com/quek/arysn?branch=main#35bbe21f2fc28bc2d11283a0790ad21aa1568279"
 dependencies = [
  "Inflector",
  "anyhow",
@@ -357,6 +357,17 @@ dependencies = [
  "syn 1.0.34",
  "tokio",
  "tokio-postgres",
+]
+
+[[package]]
+name = "async-recursion"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e5444eec77a9ec2bfe4524139e09195862e981400c4358d3b760cae634e4c4ee"
+dependencies = [
+ "proc-macro2 1.0.18",
+ "quote 1.0.7",
+ "syn 1.0.34",
 ]
 
 [[package]]
@@ -1518,6 +1529,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
 
 [[package]]
+name = "postgres-derive"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c857dd221cb0e7d8414b894a0ce29eae44d453dda0baa132447878e75e701477"
+dependencies = [
+ "proc-macro2 1.0.18",
+ "quote 1.0.7",
+ "syn 1.0.34",
+]
+
+[[package]]
 name = "postgres-protocol"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1544,6 +1566,7 @@ dependencies = [
  "bytes",
  "chrono",
  "fallible-iterator",
+ "postgres-derive",
  "postgres-protocol",
 ]
 
@@ -1875,6 +1898,7 @@ dependencies = [
  "actix-web",
  "anyhow",
  "arysn",
+ "async-recursion",
  "chrono",
  "derive_more 0.15.0",
  "diesel",
@@ -1884,10 +1908,12 @@ dependencies = [
  "lazy_static",
  "listenfd",
  "log",
+ "postgres-types",
  "quote 1.0.7",
  "r2d2",
  "serde",
  "serde_json",
+ "tokio-postgres",
  "url",
 ]
 
