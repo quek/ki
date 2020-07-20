@@ -35,7 +35,7 @@ anyhow = "1"
 async-recursion = "0.3"
 tokio-postgres = { version = "0.5", features = ["with-chrono-0_4"] }
 postgres-types = { version = "0.1", features = ["derive"] }
-
+deadpool-postgres = "0.5"
 
 [build-dependencies]
 anyhow = "1"

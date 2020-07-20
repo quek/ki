@@ -5,6 +5,7 @@ mod app;
 mod common;
 mod component;
 mod fetch;
+mod generated;
 mod global_state;
 mod markdown;
 mod prism;

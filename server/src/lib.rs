@@ -9,6 +9,7 @@ use diesel::PgConnection;
 use listenfd::ListenFd;
 use std::env::var;
 use thread_data::ThreadData;
+use tokio_postgres::NoTls;
 
 pub mod api;
 pub mod auth;
@@ -48,6 +49,16 @@ pub async fn run() -> std::io::Result<()> {
         .build(manager)
         .expect("Failed to create pool!");
 
+    let dpool = {
+        let mut config = deadpool_postgres::Config::new();
+        config.dbname = Some("ki_development".to_string());
+        config.host = Some("db".to_string());
+        config.user = Some("ki".to_string());
+        config.password = Some("password".to_string());
+
+        config.create_pool(NoTls).unwrap()
+    };
+
     let server = HttpServer::new(move || {
         App::new()
             .wrap(Logger::default())
@@ -58,7 +69,10 @@ pub async fn run() -> std::io::Result<()> {
                     .max_age_time(chrono::Duration::hours(12))
                     .secure(false), // this can only be true if you have https
             ))
-            .data(ThreadData { pool: pool.clone() })
+            .data(ThreadData {
+                pool: pool.clone(),
+                dpool: dpool.clone(),
+            })
             .service(
                 web::scope("/api")
                     .route("/hello", web::get().to(api::hello))

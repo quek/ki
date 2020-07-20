@@ -1,0 +1,1 @@
+../../../server/src/generated/user.rs
