@@ -28,3 +28,6 @@ migration-run:
 
 psql:
 	docker exec -it ki_db_1 psql -U ki ki_development
+
+arysn_cli:
+	docker exec -it ki_server_1 cargo run --package arysn_cli

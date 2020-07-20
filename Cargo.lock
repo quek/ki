@@ -360,6 +360,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "arysn_cli"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "arysn",
+ "quote 1.0.7",
+]
+
+[[package]]
 name = "async-recursion"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
