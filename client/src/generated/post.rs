@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
     derive(FromSql, ToSql),
     postgres(name = "post_status")
 )]
-pub enum PostStatu {
+pub enum PostStatus {
     #[cfg_attr(target_arch = "x86_64", postgres(name = "draft"))]
     Draft,
     #[cfg_attr(target_arch = "x86_64", postgres(name = "published"))]
@@ -18,7 +18,7 @@ pub struct Post {
     pub id: i32,
     pub title: String,
     pub body: String,
-    pub status: PostStatu,
+    pub status: PostStatus,
     pub published_at: Option<chrono::NaiveDateTime>,
     pub created_at: Option<chrono::NaiveDateTime>,
     pub updated_at: Option<chrono::NaiveDateTime>,
@@ -28,7 +28,7 @@ pub struct PostNew {
     pub id: Option<i32>,
     pub title: String,
     pub body: String,
-    pub status: PostStatu,
+    pub status: PostStatus,
     pub published_at: Option<chrono::NaiveDateTime>,
     pub created_at: Option<chrono::NaiveDateTime>,
     pub updated_at: Option<chrono::NaiveDateTime>,

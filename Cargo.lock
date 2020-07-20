@@ -344,24 +344,6 @@ checksum = "cff77d8686867eceff3105329d4698d96c2391c176d5d03adc90c7389162b5b8"
 [[package]]
 name = "arysn"
 version = "0.1.0"
-source = "git+https://github.com/quek/arysn?branch=main#869529945f95691556c07256aa79362acfbe2a4b"
-dependencies = [
- "Inflector",
- "anyhow",
- "chrono",
- "dyn-clone",
- "env_logger",
- "log",
- "proc-macro2 1.0.18",
- "quote 1.0.7",
- "syn 1.0.34",
- "tokio",
- "tokio-postgres",
-]
-
-[[package]]
-name = "arysn"
-version = "0.1.0"
 dependencies = [
  "Inflector",
  "anyhow",
@@ -381,7 +363,7 @@ name = "arysn_cli"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "arysn 0.1.0",
+ "arysn",
  "env_logger",
  "log",
  "quote 1.0.7",
@@ -1994,7 +1976,7 @@ dependencies = [
  "actix-service",
  "actix-web",
  "anyhow",
- "arysn 0.1.0 (git+https://github.com/quek/arysn?branch=main)",
+ "arysn",
  "async-recursion",
  "chrono",
  "deadpool-postgres",

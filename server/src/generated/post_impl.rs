@@ -86,6 +86,8 @@ pub struct PostBuilder {
     pub filters: Vec<Filter>,
     pub preload: bool,
     pub order: String,
+    pub limit: Option<usize>,
+    pub offset: Option<usize>,
 }
 impl PostBuilder {
     pub fn id(&self) -> PostBuilder_id {
@@ -129,6 +131,18 @@ impl PostBuilder {
             ..self.clone()
         }
     }
+    pub fn limit(&self, value: usize) -> Self {
+        Self {
+            limit: Some(value),
+            ..self.clone()
+        }
+    }
+    pub fn offset(&self, value: usize) -> Self {
+        Self {
+            offset: Some(value),
+            ..self.clone()
+        }
+    }
     pub fn preload(&self) -> Self {
         Self {
             preload: true,
@@ -169,6 +183,12 @@ impl BuilderTrait for PostBuilder {
     }
     fn order_part(&self) -> String {
         self.order.clone()
+    }
+    fn limit(&self) -> Option<usize> {
+        self.limit
+    }
+    fn offset(&self) -> Option<usize> {
+        self.offset
     }
 }
 #[allow(non_camel_case_types)]
@@ -284,7 +304,7 @@ pub struct PostBuilder_status {
     pub builder: PostBuilder,
 }
 impl PostBuilder_status {
-    pub fn eq(&self, value: PostStatu) -> PostBuilder {
+    pub fn eq(&self, value: PostStatus) -> PostBuilder {
         let mut filters = self.builder.filters.clone();
         filters.push(Filter {
             table: "posts".to_string(),
@@ -297,7 +317,7 @@ impl PostBuilder_status {
             ..self.builder.clone()
         }
     }
-    pub fn eq_any(&self, values: Vec<PostStatu>) -> PostBuilder {
+    pub fn eq_any(&self, values: Vec<PostStatus>) -> PostBuilder {
         let mut filters = self.builder.filters.clone();
         let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
         for v in values {

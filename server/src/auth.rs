@@ -1,13 +1,10 @@
-use crate::common::models::User;
-use crate::common::types::UserStatus;
 use crate::errors::ServiceError;
+use crate::generated::user::{User, UserStatus};
 use crate::thread_data::ThreadData;
 use actix_identity::Identity;
 use actix_web::client::Client;
 use actix_web::web;
 use actix_web::HttpResponse;
-use diesel::prelude::*;
-use diesel::PgConnection;
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::env::var;
@@ -95,16 +92,14 @@ pub async fn login_code(
         // let x = response.unwrap().body().await.unwrap();
         // println!("user_info {:?}", &x);
 
-        let user = web::block(move || {
-            use crate::schema::users;
-            let conn: &PgConnection = &data.pool.get().unwrap();
-            let user: User = users::table
-                .filter(users::email.eq(user_info.email))
-                .filter(users::status.eq(UserStatus::Active))
-                .first(conn)?;
-            Ok(user)
-        })
-        .await?;
+        let conn = &data.dpool.get().await.unwrap();
+        let user: User = User::select()
+            .email()
+            .eq(user_info.email)
+            .status()
+            .eq(UserStatus::Active)
+            .first(conn)
+            .await?;
 
         identity.remember(serde_json::to_string(&user).unwrap());
         Ok(HttpResponse::Found()

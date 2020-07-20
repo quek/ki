@@ -62,3 +62,10 @@ impl From<diesel::result::Error> for ServiceError {
         }
     }
 }
+
+impl From<anyhow::Error> for ServiceError {
+    fn from(error: anyhow::Error) -> ServiceError {
+        log::error!("{:#?}", &error);
+        ServiceError::InternalServerError
+    }
+}

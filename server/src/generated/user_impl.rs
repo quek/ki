@@ -82,6 +82,8 @@ pub struct UserBuilder {
     pub filters: Vec<Filter>,
     pub preload: bool,
     pub order: String,
+    pub limit: Option<usize>,
+    pub offset: Option<usize>,
 }
 impl UserBuilder {
     pub fn id(&self) -> UserBuilder_id {
@@ -117,6 +119,18 @@ impl UserBuilder {
     pub fn order<T: AsRef<str>>(&self, value: T) -> Self {
         Self {
             order: value.as_ref().to_string(),
+            ..self.clone()
+        }
+    }
+    pub fn limit(&self, value: usize) -> Self {
+        Self {
+            limit: Some(value),
+            ..self.clone()
+        }
+    }
+    pub fn offset(&self, value: usize) -> Self {
+        Self {
+            offset: Some(value),
             ..self.clone()
         }
     }
@@ -160,6 +174,12 @@ impl BuilderTrait for UserBuilder {
     }
     fn order_part(&self) -> String {
         self.order.clone()
+    }
+    fn limit(&self) -> Option<usize> {
+        self.limit
+    }
+    fn offset(&self) -> Option<usize> {
+        self.offset
     }
 }
 #[allow(non_camel_case_types)]
@@ -275,7 +295,7 @@ pub struct UserBuilder_status {
     pub builder: UserBuilder,
 }
 impl UserBuilder_status {
-    pub fn eq(&self, value: UserStatu) -> UserBuilder {
+    pub fn eq(&self, value: UserStatus) -> UserBuilder {
         let mut filters = self.builder.filters.clone();
         filters.push(Filter {
             table: "users".to_string(),
@@ -288,7 +308,7 @@ impl UserBuilder_status {
             ..self.builder.clone()
         }
     }
-    pub fn eq_any(&self, values: Vec<UserStatu>) -> UserBuilder {
+    pub fn eq_any(&self, values: Vec<UserStatus>) -> UserBuilder {
         let mut filters = self.builder.filters.clone();
         let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
         for v in values {
