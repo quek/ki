@@ -5,7 +5,7 @@ use quote::format_ident;
 
 fn main() -> Result<()> {
     define_ar(&Config {
-        path: "src/generated/user.rs",
+        path: "../arysn_cli/generated/user.rs",
         table_name: "users",
         struct_name: format_ident!("{}", "User"),
         has_many: vec![],
@@ -13,7 +13,7 @@ fn main() -> Result<()> {
     })?;
 
     define_ar(&Config {
-        path: "src/generated/post.rs",
+        path: "../arysn_cli/generated/post.rs",
         table_name: "posts",
         struct_name: format_ident!("{}", "Post"),
         has_many: vec![],

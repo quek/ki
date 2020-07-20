@@ -30,6 +30,7 @@ services:
     volumes:
       - .:/app
       - ~/.cargo:/cargo
+      - ../arysn:/arysn
     environment:
       SECRET_KEY:
       REDIRECT_URL:

@@ -8,5 +8,7 @@ edition = "2018"
 
 [dependencies]
 anyhow = "1"
-arysn = { git = "https://github.com/quek/arysn", branch = "main" }
+arysn = { path = "../../arysn/arysn" }
+env_logger = "0.7"
+log = "0.4"
 quote = "1"

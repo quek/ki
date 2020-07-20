@@ -360,11 +360,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "arysn"
+version = "0.1.0"
+dependencies = [
+ "Inflector",
+ "anyhow",
+ "chrono",
+ "dyn-clone",
+ "env_logger",
+ "log",
+ "proc-macro2 1.0.18",
+ "quote 1.0.7",
+ "syn 1.0.34",
+ "tokio",
+ "tokio-postgres",
+]
+
+[[package]]
 name = "arysn_cli"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "arysn",
+ "arysn 0.1.0",
+ "env_logger",
+ "log",
  "quote 1.0.7",
 ]
 
@@ -1975,7 +1994,7 @@ dependencies = [
  "actix-service",
  "actix-web",
  "anyhow",
- "arysn",
+ "arysn 0.1.0 (git+https://github.com/quek/arysn?branch=main)",
  "async-recursion",
  "chrono",
  "deadpool-postgres",

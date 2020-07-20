@@ -3,4 +3,4 @@
 /.env.production
 /target
 /tmp
-/server/src/generated/
+/arysn_cli/generated/
