@@ -1,7 +1,6 @@
 use crate::common::form::{PostErrors, PostForm};
-use crate::common::models::Post;
-use crate::common::types::PostStatus;
 use crate::component::error;
+use crate::generated::post::{Post, PostStatus};
 use crate::utils;
 use web_sys::Event;
 use web_sys::HtmlInputElement;

@@ -1,7 +1,7 @@
 #[cfg(target_arch = "x86_64")]
 use postgres_types::{FromSql, ToSql};
 use serde::{Deserialize, Serialize};
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
 #[cfg_attr(
     target_arch = "x86_64",
     derive(FromSql, ToSql),
@@ -19,8 +19,8 @@ pub struct User {
     pub email: String,
     pub name: String,
     pub status: UserStatus,
-    pub created_at: Option<chrono::NaiveDateTime>,
-    pub updated_at: Option<chrono::NaiveDateTime>,
+    pub created_at: chrono::NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
 }
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct UserNew {

@@ -63,7 +63,7 @@ impl Model {
               <i class="fas fa-upload"></i>
               {post.published_at.unwrap().format("%Y-%m-%d %H:%M:%S")}
               <i class="fas fa-history"></i>
-              {post.updated_at.unwrap().format("%Y-%m-%d %H:%M:%S")}
+              {post.updated_at.format("%Y-%m-%d %H:%M:%S")}
             </div>
           </div>
         }

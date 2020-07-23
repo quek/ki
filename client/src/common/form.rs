@@ -1,5 +1,5 @@
-use crate::common::types::PostStatus;
 use crate::common::validate;
+use crate::generated::post::PostStatus;
 use serde::{Deserialize, Serialize};
 
 #[cfg(target_arch = "wasm32")]

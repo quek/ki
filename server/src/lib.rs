@@ -17,8 +17,6 @@ pub mod common;
 pub mod errors;
 pub mod generated;
 pub mod middleware;
-pub mod paginate;
-pub mod schema;
 pub mod thread_data;
 pub mod utils;
 

@@ -1,8 +1,9 @@
-use crate::common::models::{Post, PostQuery, PER_PAGE};
-use crate::common::types::PostStatus;
+use crate::common::models::{PostQuery, PER_PAGE};
 use crate::component::pager;
 use crate::component::Link;
 use crate::fetch;
+use crate::generated::post::Post;
+use crate::generated::post::PostStatus;
 use crate::routes::{AdminRoute, AppRoute};
 use crate::utils;
 use yew::{html, Callback, Component, ComponentLink, Html, ShouldRender};
@@ -10,16 +11,16 @@ use yew::{html, Callback, Component, ComponentLink, Html, ShouldRender};
 pub struct Model {
     link: ComponentLink<Self>,
     posts: Vec<Post>,
-    total_count: i64,
+    total_count: usize,
     query: PostQuery,
-    pager_callback: Callback<i64>,
+    pager_callback: Callback<usize>,
     #[allow(dead_code)]
     fetch_task: fetch::FetchTask,
 }
 
 pub enum Msg {
-    Posts((Vec<Post>, i64)),
-    Page(i64),
+    Posts((Vec<Post>, usize)),
+    Page(usize),
 }
 
 impl Component for Model {
@@ -28,7 +29,7 @@ impl Component for Model {
 
     fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
         let query = serde_qs::from_str(&utils::query_string()).unwrap_or(PostQuery::default());
-        let pager_callback = link.callback(move |page: i64| Msg::Page(page));
+        let pager_callback = link.callback(move |page: usize| Msg::Page(page));
         let fetch_task = fetch_posts(&query, &link);
         Self {
             link,
@@ -106,7 +107,7 @@ impl Model {
 }
 
 fn fetch_posts(query: &PostQuery, link: &ComponentLink<Model>) -> fetch::FetchTask {
-    let callback = link.callback(|posts: (Vec<Post>, i64)| Msg::Posts(posts));
+    let callback = link.callback(|posts: (Vec<Post>, usize)| Msg::Posts(posts));
     let url = &format!(
         "/api/admin/posts?{}",
         serde_qs::to_string(&query).unwrap_or("".to_string())
