@@ -1,16 +1,7 @@
 use crate::generated::post::PostStatus;
-#[cfg(target_arch = "x86_64")]
-use diesel_derive_enum::DbEnum;
-use serde::{Deserialize, Serialize};
+use crate::generated::user::UserStatus;
 use std::fmt;
 use std::str;
-
-#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
-#[cfg_attr(target_arch = "x86_64", derive(DbEnum), DieselType = "User_status")]
-pub enum UserStatus {
-    Active,
-    Locked,
-}
 
 impl fmt::Display for UserStatus {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

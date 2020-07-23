@@ -1,11 +1,5 @@
-#[macro_use]
-extern crate diesel;
-
 use actix_identity::{CookieIdentityPolicy, IdentityService};
 use actix_web::{middleware::Logger, web, App, HttpServer};
-use diesel::connection::Connection;
-use diesel::r2d2::ConnectionManager;
-use diesel::PgConnection;
 use listenfd::ListenFd;
 use std::env::var;
 use thread_data::ThreadData;
@@ -20,32 +14,11 @@ pub mod middleware;
 pub mod thread_data;
 pub mod utils;
 
-// type alias to use in multiple places
-pub type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
-
-#[derive(Copy, Clone, Debug)]
-pub struct MyConnectionCustomizer;
-
-// diesel が UTC ハードコードしているので
-// diesel-1.4.2/src/pg/connection/mod.rs set_config_options
-impl<E> r2d2::CustomizeConnection<PgConnection, E> for MyConnectionCustomizer {
-    fn on_acquire(&self, conn: &mut PgConnection) -> Result<(), E> {
-        conn.execute("SET TIME ZONE 'Japan'").unwrap();
-        Ok(())
-    }
-}
-
 pub async fn run() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "server=debug,actix_web=info,actix_server=info");
     env_logger::init();
 
-    let postgres_url = var("DATABASE_URL").expect("DATABASE_URL must be set!");
-    let manager = ConnectionManager::<PgConnection>::new(postgres_url);
-    let connection_customizer = Box::new(MyConnectionCustomizer);
-    let pool: Pool = r2d2::Pool::builder()
-        .connection_customizer(connection_customizer)
-        .build(manager)
-        .expect("Failed to create pool!");
+    // let postgres_url = var("DATABASE_URL").expect("DATABASE_URL must be set!");
 
     let dpool = {
         let mut config = deadpool_postgres::Config::new();
@@ -68,7 +41,6 @@ pub async fn run() -> std::io::Result<()> {
                     .secure(false), // this can only be true if you have https
             ))
             .data(ThreadData {
-                pool: pool.clone(),
                 dpool: dpool.clone(),
             })
             .service(
