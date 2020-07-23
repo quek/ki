@@ -83,9 +83,10 @@ impl From<tokio_postgres::row::Row> for Post {
 #[derive(Clone, Debug, Default)]
 pub struct PostBuilder {
     pub from: String,
+    pub table_name_as: Option<String>,
     pub filters: Vec<Filter>,
     pub preload: bool,
-    pub order: String,
+    pub orders: Vec<OrderItem>,
     pub limit: Option<usize>,
     pub offset: Option<usize>,
 }
@@ -123,12 +124,6 @@ impl PostBuilder {
     pub fn updated_at(&self) -> PostBuilder_updated_at {
         PostBuilder_updated_at {
             builder: self.clone(),
-        }
-    }
-    pub fn order<T: AsRef<str>>(&self, value: T) -> Self {
-        Self {
-            order: value.as_ref().to_string(),
-            ..self.clone()
         }
     }
     pub fn limit(&self, value: usize) -> Self {
@@ -181,8 +176,8 @@ impl BuilderTrait for PostBuilder {
         let mut result: Vec<&Filter> = self.filters.iter().collect();
         result
     }
-    fn order_part(&self) -> String {
-        self.order.clone()
+    fn order(&self) -> &Vec<OrderItem> {
+        &self.orders
     }
     fn limit(&self) -> Option<usize> {
         self.limit
@@ -199,10 +194,159 @@ impl PostBuilder_id {
     pub fn eq(&self, value: i32) -> PostBuilder {
         let mut filters = self.builder.filters.clone();
         filters.push(Filter {
-            table: "posts".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
             name: stringify!(id).to_string(),
             values: vec![Box::new(value)],
             operator: "=".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gt(&self, value: i32) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(id).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lt(&self, value: i32) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(id).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gte(&self, value: i32) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(id).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">=".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lte(&self, value: i32) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(id).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<=".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_eq(&self, value: i32) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(id).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<>".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_null(&self) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(id).to_string(),
+            values: vec![],
+            operator: "IS NULL".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_not_null(&self) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(id).to_string(),
+            values: vec![],
+            operator: "IS NOT NULL".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn between(&self, from: i32, to: i32) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(id).to_string(),
+            values: vec![Box::new(from), Box::new(to)],
+            operator: "BETWEEN".to_string(),
         });
         PostBuilder {
             filters,
@@ -216,10 +360,59 @@ impl PostBuilder_id {
             vs.push(Box::new(v));
         }
         filters.push(Filter {
-            table: "posts".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
             name: stringify!(id).to_string(),
             values: vs,
-            operator: "in".to_string(),
+            operator: "IN".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn r#in(&self, values: Vec<i32>) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(id).to_string(),
+            values: vs,
+            operator: "IN".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_in(&self, values: Vec<i32>) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(id).to_string(),
+            values: vs,
+            operator: "NOT IN".to_string(),
         });
         PostBuilder {
             filters,
@@ -235,10 +428,159 @@ impl PostBuilder_title {
     pub fn eq(&self, value: String) -> PostBuilder {
         let mut filters = self.builder.filters.clone();
         filters.push(Filter {
-            table: "posts".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
             name: stringify!(title).to_string(),
             values: vec![Box::new(value)],
             operator: "=".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gt(&self, value: String) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(title).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lt(&self, value: String) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(title).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gte(&self, value: String) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(title).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">=".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lte(&self, value: String) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(title).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<=".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_eq(&self, value: String) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(title).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<>".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_null(&self) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(title).to_string(),
+            values: vec![],
+            operator: "IS NULL".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_not_null(&self) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(title).to_string(),
+            values: vec![],
+            operator: "IS NOT NULL".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn between(&self, from: String, to: String) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(title).to_string(),
+            values: vec![Box::new(from), Box::new(to)],
+            operator: "BETWEEN".to_string(),
         });
         PostBuilder {
             filters,
@@ -252,10 +594,59 @@ impl PostBuilder_title {
             vs.push(Box::new(v));
         }
         filters.push(Filter {
-            table: "posts".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
             name: stringify!(title).to_string(),
             values: vs,
-            operator: "in".to_string(),
+            operator: "IN".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn r#in(&self, values: Vec<String>) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(title).to_string(),
+            values: vs,
+            operator: "IN".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_in(&self, values: Vec<String>) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(title).to_string(),
+            values: vs,
+            operator: "NOT IN".to_string(),
         });
         PostBuilder {
             filters,
@@ -271,10 +662,159 @@ impl PostBuilder_body {
     pub fn eq(&self, value: String) -> PostBuilder {
         let mut filters = self.builder.filters.clone();
         filters.push(Filter {
-            table: "posts".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
             name: stringify!(body).to_string(),
             values: vec![Box::new(value)],
             operator: "=".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gt(&self, value: String) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(body).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lt(&self, value: String) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(body).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gte(&self, value: String) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(body).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">=".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lte(&self, value: String) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(body).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<=".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_eq(&self, value: String) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(body).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<>".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_null(&self) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(body).to_string(),
+            values: vec![],
+            operator: "IS NULL".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_not_null(&self) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(body).to_string(),
+            values: vec![],
+            operator: "IS NOT NULL".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn between(&self, from: String, to: String) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(body).to_string(),
+            values: vec![Box::new(from), Box::new(to)],
+            operator: "BETWEEN".to_string(),
         });
         PostBuilder {
             filters,
@@ -288,10 +828,59 @@ impl PostBuilder_body {
             vs.push(Box::new(v));
         }
         filters.push(Filter {
-            table: "posts".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
             name: stringify!(body).to_string(),
             values: vs,
-            operator: "in".to_string(),
+            operator: "IN".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn r#in(&self, values: Vec<String>) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(body).to_string(),
+            values: vs,
+            operator: "IN".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_in(&self, values: Vec<String>) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(body).to_string(),
+            values: vs,
+            operator: "NOT IN".to_string(),
         });
         PostBuilder {
             filters,
@@ -307,10 +896,159 @@ impl PostBuilder_status {
     pub fn eq(&self, value: PostStatus) -> PostBuilder {
         let mut filters = self.builder.filters.clone();
         filters.push(Filter {
-            table: "posts".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
             name: stringify!(status).to_string(),
             values: vec![Box::new(value)],
             operator: "=".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gt(&self, value: PostStatus) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(status).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lt(&self, value: PostStatus) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(status).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gte(&self, value: PostStatus) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(status).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">=".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lte(&self, value: PostStatus) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(status).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<=".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_eq(&self, value: PostStatus) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(status).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<>".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_null(&self) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(status).to_string(),
+            values: vec![],
+            operator: "IS NULL".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_not_null(&self) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(status).to_string(),
+            values: vec![],
+            operator: "IS NOT NULL".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn between(&self, from: PostStatus, to: PostStatus) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(status).to_string(),
+            values: vec![Box::new(from), Box::new(to)],
+            operator: "BETWEEN".to_string(),
         });
         PostBuilder {
             filters,
@@ -324,10 +1062,59 @@ impl PostBuilder_status {
             vs.push(Box::new(v));
         }
         filters.push(Filter {
-            table: "posts".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
             name: stringify!(status).to_string(),
             values: vs,
-            operator: "in".to_string(),
+            operator: "IN".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn r#in(&self, values: Vec<PostStatus>) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(status).to_string(),
+            values: vs,
+            operator: "IN".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_in(&self, values: Vec<PostStatus>) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(status).to_string(),
+            values: vs,
+            operator: "NOT IN".to_string(),
         });
         PostBuilder {
             filters,
@@ -343,10 +1130,159 @@ impl PostBuilder_published_at {
     pub fn eq(&self, value: chrono::NaiveDateTime) -> PostBuilder {
         let mut filters = self.builder.filters.clone();
         filters.push(Filter {
-            table: "posts".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
             name: stringify!(published_at).to_string(),
             values: vec![Box::new(value)],
             operator: "=".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gt(&self, value: chrono::NaiveDateTime) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(published_at).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lt(&self, value: chrono::NaiveDateTime) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(published_at).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gte(&self, value: chrono::NaiveDateTime) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(published_at).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">=".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lte(&self, value: chrono::NaiveDateTime) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(published_at).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<=".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_eq(&self, value: chrono::NaiveDateTime) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(published_at).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<>".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_null(&self) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(published_at).to_string(),
+            values: vec![],
+            operator: "IS NULL".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_not_null(&self) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(published_at).to_string(),
+            values: vec![],
+            operator: "IS NOT NULL".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn between(&self, from: chrono::NaiveDateTime, to: chrono::NaiveDateTime) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(published_at).to_string(),
+            values: vec![Box::new(from), Box::new(to)],
+            operator: "BETWEEN".to_string(),
         });
         PostBuilder {
             filters,
@@ -360,10 +1296,59 @@ impl PostBuilder_published_at {
             vs.push(Box::new(v));
         }
         filters.push(Filter {
-            table: "posts".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
             name: stringify!(published_at).to_string(),
             values: vs,
-            operator: "in".to_string(),
+            operator: "IN".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn r#in(&self, values: Vec<chrono::NaiveDateTime>) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(published_at).to_string(),
+            values: vs,
+            operator: "IN".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_in(&self, values: Vec<chrono::NaiveDateTime>) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(published_at).to_string(),
+            values: vs,
+            operator: "NOT IN".to_string(),
         });
         PostBuilder {
             filters,
@@ -379,10 +1364,159 @@ impl PostBuilder_created_at {
     pub fn eq(&self, value: chrono::NaiveDateTime) -> PostBuilder {
         let mut filters = self.builder.filters.clone();
         filters.push(Filter {
-            table: "posts".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
             name: stringify!(created_at).to_string(),
             values: vec![Box::new(value)],
             operator: "=".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gt(&self, value: chrono::NaiveDateTime) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(created_at).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lt(&self, value: chrono::NaiveDateTime) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(created_at).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gte(&self, value: chrono::NaiveDateTime) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(created_at).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">=".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lte(&self, value: chrono::NaiveDateTime) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(created_at).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<=".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_eq(&self, value: chrono::NaiveDateTime) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(created_at).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<>".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_null(&self) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(created_at).to_string(),
+            values: vec![],
+            operator: "IS NULL".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_not_null(&self) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(created_at).to_string(),
+            values: vec![],
+            operator: "IS NOT NULL".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn between(&self, from: chrono::NaiveDateTime, to: chrono::NaiveDateTime) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(created_at).to_string(),
+            values: vec![Box::new(from), Box::new(to)],
+            operator: "BETWEEN".to_string(),
         });
         PostBuilder {
             filters,
@@ -396,10 +1530,59 @@ impl PostBuilder_created_at {
             vs.push(Box::new(v));
         }
         filters.push(Filter {
-            table: "posts".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
             name: stringify!(created_at).to_string(),
             values: vs,
-            operator: "in".to_string(),
+            operator: "IN".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn r#in(&self, values: Vec<chrono::NaiveDateTime>) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(created_at).to_string(),
+            values: vs,
+            operator: "IN".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_in(&self, values: Vec<chrono::NaiveDateTime>) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(created_at).to_string(),
+            values: vs,
+            operator: "NOT IN".to_string(),
         });
         PostBuilder {
             filters,
@@ -415,10 +1598,159 @@ impl PostBuilder_updated_at {
     pub fn eq(&self, value: chrono::NaiveDateTime) -> PostBuilder {
         let mut filters = self.builder.filters.clone();
         filters.push(Filter {
-            table: "posts".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
             name: stringify!(updated_at).to_string(),
             values: vec![Box::new(value)],
             operator: "=".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gt(&self, value: chrono::NaiveDateTime) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(updated_at).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lt(&self, value: chrono::NaiveDateTime) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(updated_at).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gte(&self, value: chrono::NaiveDateTime) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(updated_at).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">=".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lte(&self, value: chrono::NaiveDateTime) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(updated_at).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<=".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_eq(&self, value: chrono::NaiveDateTime) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(updated_at).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<>".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_null(&self) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(updated_at).to_string(),
+            values: vec![],
+            operator: "IS NULL".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_not_null(&self) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(updated_at).to_string(),
+            values: vec![],
+            operator: "IS NOT NULL".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn between(&self, from: chrono::NaiveDateTime, to: chrono::NaiveDateTime) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(updated_at).to_string(),
+            values: vec![Box::new(from), Box::new(to)],
+            operator: "BETWEEN".to_string(),
         });
         PostBuilder {
             filters,
@@ -432,14 +1764,155 @@ impl PostBuilder_updated_at {
             vs.push(Box::new(v));
         }
         filters.push(Filter {
-            table: "posts".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
             name: stringify!(updated_at).to_string(),
             values: vs,
-            operator: "in".to_string(),
+            operator: "IN".to_string(),
         });
         PostBuilder {
             filters,
             ..self.builder.clone()
         }
+    }
+    pub fn r#in(&self, values: Vec<chrono::NaiveDateTime>) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(updated_at).to_string(),
+            values: vs,
+            operator: "IN".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_in(&self, values: Vec<chrono::NaiveDateTime>) -> PostBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            name: stringify!(updated_at).to_string(),
+            values: vs,
+            operator: "NOT IN".to_string(),
+        });
+        PostBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+}
+impl PostBuilder {
+    pub fn order(&self) -> PostOrderBuilder {
+        PostOrderBuilder {
+            builder: self.clone(),
+        }
+    }
+}
+#[derive(Clone, Debug)]
+pub struct PostOrderBuilder {
+    pub builder: PostBuilder,
+}
+impl PostOrderBuilder {
+    pub fn id(&self) -> PostOrderAscOrDesc {
+        PostOrderAscOrDesc {
+            field: "id",
+            order_builder: self.clone(),
+        }
+    }
+    pub fn title(&self) -> PostOrderAscOrDesc {
+        PostOrderAscOrDesc {
+            field: "title",
+            order_builder: self.clone(),
+        }
+    }
+    pub fn body(&self) -> PostOrderAscOrDesc {
+        PostOrderAscOrDesc {
+            field: "body",
+            order_builder: self.clone(),
+        }
+    }
+    pub fn status(&self) -> PostOrderAscOrDesc {
+        PostOrderAscOrDesc {
+            field: "status",
+            order_builder: self.clone(),
+        }
+    }
+    pub fn published_at(&self) -> PostOrderAscOrDesc {
+        PostOrderAscOrDesc {
+            field: "published_at",
+            order_builder: self.clone(),
+        }
+    }
+    pub fn created_at(&self) -> PostOrderAscOrDesc {
+        PostOrderAscOrDesc {
+            field: "created_at",
+            order_builder: self.clone(),
+        }
+    }
+    pub fn updated_at(&self) -> PostOrderAscOrDesc {
+        PostOrderAscOrDesc {
+            field: "updated_at",
+            order_builder: self.clone(),
+        }
+    }
+}
+#[derive(Clone, Debug)]
+pub struct PostOrderAscOrDesc {
+    pub field: &'static str,
+    pub order_builder: PostOrderBuilder,
+}
+impl PostOrderAscOrDesc {
+    pub fn asc(&self) -> PostBuilder {
+        let mut builder = self.order_builder.builder.clone();
+        builder.orders.push(OrderItem {
+            table: self
+                .order_builder
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            field: self.field,
+            asc_or_desc: "ASC",
+        });
+        builder
+    }
+    pub fn desc(&self) -> PostBuilder {
+        let mut builder = self.order_builder.builder.clone();
+        builder.orders.push(OrderItem {
+            table: self
+                .order_builder
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"posts".to_string())
+                .to_string(),
+            field: self.field,
+            asc_or_desc: "DESC",
+        });
+        builder
     }
 }

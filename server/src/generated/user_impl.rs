@@ -79,9 +79,10 @@ impl From<tokio_postgres::row::Row> for User {
 #[derive(Clone, Debug, Default)]
 pub struct UserBuilder {
     pub from: String,
+    pub table_name_as: Option<String>,
     pub filters: Vec<Filter>,
     pub preload: bool,
-    pub order: String,
+    pub orders: Vec<OrderItem>,
     pub limit: Option<usize>,
     pub offset: Option<usize>,
 }
@@ -114,12 +115,6 @@ impl UserBuilder {
     pub fn updated_at(&self) -> UserBuilder_updated_at {
         UserBuilder_updated_at {
             builder: self.clone(),
-        }
-    }
-    pub fn order<T: AsRef<str>>(&self, value: T) -> Self {
-        Self {
-            order: value.as_ref().to_string(),
-            ..self.clone()
         }
     }
     pub fn limit(&self, value: usize) -> Self {
@@ -172,8 +167,8 @@ impl BuilderTrait for UserBuilder {
         let mut result: Vec<&Filter> = self.filters.iter().collect();
         result
     }
-    fn order_part(&self) -> String {
-        self.order.clone()
+    fn order(&self) -> &Vec<OrderItem> {
+        &self.orders
     }
     fn limit(&self) -> Option<usize> {
         self.limit
@@ -190,10 +185,159 @@ impl UserBuilder_id {
     pub fn eq(&self, value: i32) -> UserBuilder {
         let mut filters = self.builder.filters.clone();
         filters.push(Filter {
-            table: "users".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
             name: stringify!(id).to_string(),
             values: vec![Box::new(value)],
             operator: "=".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gt(&self, value: i32) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(id).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lt(&self, value: i32) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(id).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gte(&self, value: i32) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(id).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">=".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lte(&self, value: i32) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(id).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<=".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_eq(&self, value: i32) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(id).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<>".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_null(&self) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(id).to_string(),
+            values: vec![],
+            operator: "IS NULL".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_not_null(&self) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(id).to_string(),
+            values: vec![],
+            operator: "IS NOT NULL".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn between(&self, from: i32, to: i32) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(id).to_string(),
+            values: vec![Box::new(from), Box::new(to)],
+            operator: "BETWEEN".to_string(),
         });
         UserBuilder {
             filters,
@@ -207,10 +351,59 @@ impl UserBuilder_id {
             vs.push(Box::new(v));
         }
         filters.push(Filter {
-            table: "users".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
             name: stringify!(id).to_string(),
             values: vs,
-            operator: "in".to_string(),
+            operator: "IN".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn r#in(&self, values: Vec<i32>) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(id).to_string(),
+            values: vs,
+            operator: "IN".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_in(&self, values: Vec<i32>) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(id).to_string(),
+            values: vs,
+            operator: "NOT IN".to_string(),
         });
         UserBuilder {
             filters,
@@ -226,10 +419,159 @@ impl UserBuilder_email {
     pub fn eq(&self, value: String) -> UserBuilder {
         let mut filters = self.builder.filters.clone();
         filters.push(Filter {
-            table: "users".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
             name: stringify!(email).to_string(),
             values: vec![Box::new(value)],
             operator: "=".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gt(&self, value: String) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(email).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lt(&self, value: String) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(email).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gte(&self, value: String) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(email).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">=".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lte(&self, value: String) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(email).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<=".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_eq(&self, value: String) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(email).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<>".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_null(&self) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(email).to_string(),
+            values: vec![],
+            operator: "IS NULL".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_not_null(&self) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(email).to_string(),
+            values: vec![],
+            operator: "IS NOT NULL".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn between(&self, from: String, to: String) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(email).to_string(),
+            values: vec![Box::new(from), Box::new(to)],
+            operator: "BETWEEN".to_string(),
         });
         UserBuilder {
             filters,
@@ -243,10 +585,59 @@ impl UserBuilder_email {
             vs.push(Box::new(v));
         }
         filters.push(Filter {
-            table: "users".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
             name: stringify!(email).to_string(),
             values: vs,
-            operator: "in".to_string(),
+            operator: "IN".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn r#in(&self, values: Vec<String>) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(email).to_string(),
+            values: vs,
+            operator: "IN".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_in(&self, values: Vec<String>) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(email).to_string(),
+            values: vs,
+            operator: "NOT IN".to_string(),
         });
         UserBuilder {
             filters,
@@ -262,10 +653,159 @@ impl UserBuilder_name {
     pub fn eq(&self, value: String) -> UserBuilder {
         let mut filters = self.builder.filters.clone();
         filters.push(Filter {
-            table: "users".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
             name: stringify!(name).to_string(),
             values: vec![Box::new(value)],
             operator: "=".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gt(&self, value: String) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(name).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lt(&self, value: String) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(name).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gte(&self, value: String) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(name).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">=".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lte(&self, value: String) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(name).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<=".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_eq(&self, value: String) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(name).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<>".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_null(&self) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(name).to_string(),
+            values: vec![],
+            operator: "IS NULL".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_not_null(&self) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(name).to_string(),
+            values: vec![],
+            operator: "IS NOT NULL".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn between(&self, from: String, to: String) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(name).to_string(),
+            values: vec![Box::new(from), Box::new(to)],
+            operator: "BETWEEN".to_string(),
         });
         UserBuilder {
             filters,
@@ -279,10 +819,59 @@ impl UserBuilder_name {
             vs.push(Box::new(v));
         }
         filters.push(Filter {
-            table: "users".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
             name: stringify!(name).to_string(),
             values: vs,
-            operator: "in".to_string(),
+            operator: "IN".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn r#in(&self, values: Vec<String>) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(name).to_string(),
+            values: vs,
+            operator: "IN".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_in(&self, values: Vec<String>) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(name).to_string(),
+            values: vs,
+            operator: "NOT IN".to_string(),
         });
         UserBuilder {
             filters,
@@ -298,10 +887,159 @@ impl UserBuilder_status {
     pub fn eq(&self, value: UserStatus) -> UserBuilder {
         let mut filters = self.builder.filters.clone();
         filters.push(Filter {
-            table: "users".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
             name: stringify!(status).to_string(),
             values: vec![Box::new(value)],
             operator: "=".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gt(&self, value: UserStatus) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(status).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lt(&self, value: UserStatus) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(status).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gte(&self, value: UserStatus) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(status).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">=".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lte(&self, value: UserStatus) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(status).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<=".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_eq(&self, value: UserStatus) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(status).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<>".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_null(&self) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(status).to_string(),
+            values: vec![],
+            operator: "IS NULL".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_not_null(&self) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(status).to_string(),
+            values: vec![],
+            operator: "IS NOT NULL".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn between(&self, from: UserStatus, to: UserStatus) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(status).to_string(),
+            values: vec![Box::new(from), Box::new(to)],
+            operator: "BETWEEN".to_string(),
         });
         UserBuilder {
             filters,
@@ -315,10 +1053,59 @@ impl UserBuilder_status {
             vs.push(Box::new(v));
         }
         filters.push(Filter {
-            table: "users".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
             name: stringify!(status).to_string(),
             values: vs,
-            operator: "in".to_string(),
+            operator: "IN".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn r#in(&self, values: Vec<UserStatus>) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(status).to_string(),
+            values: vs,
+            operator: "IN".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_in(&self, values: Vec<UserStatus>) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(status).to_string(),
+            values: vs,
+            operator: "NOT IN".to_string(),
         });
         UserBuilder {
             filters,
@@ -334,10 +1121,159 @@ impl UserBuilder_created_at {
     pub fn eq(&self, value: chrono::NaiveDateTime) -> UserBuilder {
         let mut filters = self.builder.filters.clone();
         filters.push(Filter {
-            table: "users".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
             name: stringify!(created_at).to_string(),
             values: vec![Box::new(value)],
             operator: "=".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gt(&self, value: chrono::NaiveDateTime) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(created_at).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lt(&self, value: chrono::NaiveDateTime) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(created_at).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gte(&self, value: chrono::NaiveDateTime) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(created_at).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">=".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lte(&self, value: chrono::NaiveDateTime) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(created_at).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<=".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_eq(&self, value: chrono::NaiveDateTime) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(created_at).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<>".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_null(&self) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(created_at).to_string(),
+            values: vec![],
+            operator: "IS NULL".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_not_null(&self) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(created_at).to_string(),
+            values: vec![],
+            operator: "IS NOT NULL".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn between(&self, from: chrono::NaiveDateTime, to: chrono::NaiveDateTime) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(created_at).to_string(),
+            values: vec![Box::new(from), Box::new(to)],
+            operator: "BETWEEN".to_string(),
         });
         UserBuilder {
             filters,
@@ -351,10 +1287,59 @@ impl UserBuilder_created_at {
             vs.push(Box::new(v));
         }
         filters.push(Filter {
-            table: "users".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
             name: stringify!(created_at).to_string(),
             values: vs,
-            operator: "in".to_string(),
+            operator: "IN".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn r#in(&self, values: Vec<chrono::NaiveDateTime>) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(created_at).to_string(),
+            values: vs,
+            operator: "IN".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_in(&self, values: Vec<chrono::NaiveDateTime>) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(created_at).to_string(),
+            values: vs,
+            operator: "NOT IN".to_string(),
         });
         UserBuilder {
             filters,
@@ -370,10 +1355,159 @@ impl UserBuilder_updated_at {
     pub fn eq(&self, value: chrono::NaiveDateTime) -> UserBuilder {
         let mut filters = self.builder.filters.clone();
         filters.push(Filter {
-            table: "users".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
             name: stringify!(updated_at).to_string(),
             values: vec![Box::new(value)],
             operator: "=".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gt(&self, value: chrono::NaiveDateTime) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(updated_at).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lt(&self, value: chrono::NaiveDateTime) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(updated_at).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn gte(&self, value: chrono::NaiveDateTime) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(updated_at).to_string(),
+            values: vec![Box::new(value)],
+            operator: ">=".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn lte(&self, value: chrono::NaiveDateTime) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(updated_at).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<=".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_eq(&self, value: chrono::NaiveDateTime) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(updated_at).to_string(),
+            values: vec![Box::new(value)],
+            operator: "<>".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_null(&self) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(updated_at).to_string(),
+            values: vec![],
+            operator: "IS NULL".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn is_not_null(&self) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(updated_at).to_string(),
+            values: vec![],
+            operator: "IS NOT NULL".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn between(&self, from: chrono::NaiveDateTime, to: chrono::NaiveDateTime) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(updated_at).to_string(),
+            values: vec![Box::new(from), Box::new(to)],
+            operator: "BETWEEN".to_string(),
         });
         UserBuilder {
             filters,
@@ -387,14 +1521,149 @@ impl UserBuilder_updated_at {
             vs.push(Box::new(v));
         }
         filters.push(Filter {
-            table: "users".to_string(),
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
             name: stringify!(updated_at).to_string(),
             values: vs,
-            operator: "in".to_string(),
+            operator: "IN".to_string(),
         });
         UserBuilder {
             filters,
             ..self.builder.clone()
         }
+    }
+    pub fn r#in(&self, values: Vec<chrono::NaiveDateTime>) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(updated_at).to_string(),
+            values: vs,
+            operator: "IN".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+    pub fn not_in(&self, values: Vec<chrono::NaiveDateTime>) -> UserBuilder {
+        let mut filters = self.builder.filters.clone();
+        let mut vs: Vec<Box<dyn ToSqlValue>> = vec![];
+        for v in values {
+            vs.push(Box::new(v));
+        }
+        filters.push(Filter {
+            table: self
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            name: stringify!(updated_at).to_string(),
+            values: vs,
+            operator: "NOT IN".to_string(),
+        });
+        UserBuilder {
+            filters,
+            ..self.builder.clone()
+        }
+    }
+}
+impl UserBuilder {
+    pub fn order(&self) -> UserOrderBuilder {
+        UserOrderBuilder {
+            builder: self.clone(),
+        }
+    }
+}
+#[derive(Clone, Debug)]
+pub struct UserOrderBuilder {
+    pub builder: UserBuilder,
+}
+impl UserOrderBuilder {
+    pub fn id(&self) -> UserOrderAscOrDesc {
+        UserOrderAscOrDesc {
+            field: "id",
+            order_builder: self.clone(),
+        }
+    }
+    pub fn email(&self) -> UserOrderAscOrDesc {
+        UserOrderAscOrDesc {
+            field: "email",
+            order_builder: self.clone(),
+        }
+    }
+    pub fn name(&self) -> UserOrderAscOrDesc {
+        UserOrderAscOrDesc {
+            field: "name",
+            order_builder: self.clone(),
+        }
+    }
+    pub fn status(&self) -> UserOrderAscOrDesc {
+        UserOrderAscOrDesc {
+            field: "status",
+            order_builder: self.clone(),
+        }
+    }
+    pub fn created_at(&self) -> UserOrderAscOrDesc {
+        UserOrderAscOrDesc {
+            field: "created_at",
+            order_builder: self.clone(),
+        }
+    }
+    pub fn updated_at(&self) -> UserOrderAscOrDesc {
+        UserOrderAscOrDesc {
+            field: "updated_at",
+            order_builder: self.clone(),
+        }
+    }
+}
+#[derive(Clone, Debug)]
+pub struct UserOrderAscOrDesc {
+    pub field: &'static str,
+    pub order_builder: UserOrderBuilder,
+}
+impl UserOrderAscOrDesc {
+    pub fn asc(&self) -> UserBuilder {
+        let mut builder = self.order_builder.builder.clone();
+        builder.orders.push(OrderItem {
+            table: self
+                .order_builder
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            field: self.field,
+            asc_or_desc: "ASC",
+        });
+        builder
+    }
+    pub fn desc(&self) -> UserBuilder {
+        let mut builder = self.order_builder.builder.clone();
+        builder.orders.push(OrderItem {
+            table: self
+                .order_builder
+                .builder
+                .table_name_as
+                .as_ref()
+                .unwrap_or(&"users".to_string())
+                .to_string(),
+            field: self.field,
+            asc_or_desc: "DESC",
+        });
+        builder
     }
 }

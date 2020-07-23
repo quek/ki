@@ -1,24 +1,22 @@
-use anyhow::Result;
 use arysn::generator::config::Config;
 use arysn::generator::define_ar;
-use quote::format_ident;
 
-fn main() -> Result<()> {
+fn main() {
     define_ar(&Config {
         path: "../arysn_cli/generated/user.rs",
         table_name: "users",
-        struct_name: format_ident!("{}", "User"),
+        struct_name: "User",
         has_many: vec![],
         belongs_to: vec![],
-    })?;
+    })
+    .unwrap();
 
     define_ar(&Config {
         path: "../arysn_cli/generated/post.rs",
         table_name: "posts",
-        struct_name: format_ident!("{}", "Post"),
+        struct_name: "Post",
         has_many: vec![],
         belongs_to: vec![],
-    })?;
-
-    Ok(())
+    })
+    .unwrap();
 }

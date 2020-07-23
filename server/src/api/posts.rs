@@ -8,7 +8,12 @@ pub async fn index(data: web::Data<ThreadData>) -> Result<HttpResponse, ServiceE
     let result: Vec<Post> = Post::select()
         .status()
         .eq(PostStatus::Published)
-        .order("posts.published_at desc, posts.id desc")
+        .order()
+        .published_at()
+        .desc()
+        .order()
+        .id()
+        .desc()
         .load(conn)
         .await
         .unwrap();

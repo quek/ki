@@ -362,11 +362,7 @@ dependencies = [
 name = "arysn_cli"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "arysn",
- "env_logger",
- "log",
- "quote 1.0.7",
 ]
 
 [[package]]
