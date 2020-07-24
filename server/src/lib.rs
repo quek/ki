@@ -1,6 +1,7 @@
 use actix_identity::{CookieIdentityPolicy, IdentityService};
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use listenfd::ListenFd;
+use serde::Deserialize;
 use std::env::var;
 use thread_data::ThreadData;
 use tokio_postgres::NoTls;
@@ -14,21 +15,25 @@ pub mod middleware;
 pub mod thread_data;
 pub mod utils;
 
+#[derive(Debug, Deserialize)]
+struct Config {
+    postgres: deadpool_postgres::Config,
+}
+
+impl Config {
+    pub fn from_env() -> Result<Self, config::ConfigError> {
+        let mut cfg = config::Config::new();
+        cfg.merge(config::Environment::new().separator("_"))?;
+        cfg.try_into()
+    }
+}
+
 pub async fn run() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "server=debug,actix_web=info,actix_server=info");
     env_logger::init();
 
-    // let postgres_url = var("DATABASE_URL").expect("DATABASE_URL must be set!");
-
-    let dpool = {
-        let mut config = deadpool_postgres::Config::new();
-        config.dbname = Some("ki_development".to_string());
-        config.host = Some("db".to_string());
-        config.user = Some("ki".to_string());
-        config.password = Some("password".to_string());
-
-        config.create_pool(NoTls).unwrap()
-    };
+    let cfg = Config::from_env().unwrap();
+    let dpool = cfg.postgres.create_pool(NoTls).unwrap();
 
     let server = HttpServer::new(move || {
         App::new()

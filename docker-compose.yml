@@ -38,6 +38,10 @@ services:
       GOOGLE_CLIENT_ID:
       GOOGLE_CLIENT_SECRET:
       DATABASE_URL:
+      POSTGRES_USER:
+      POSTGRES_PASSWORD:
+      POSTGRES_DBNAME:
+      POSTGRES_HOST:
       TZ: Asia/Tokyo
       CARGO_HOME: /cargo
       RUST_BACKTRACE: 1

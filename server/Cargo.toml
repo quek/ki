@@ -16,6 +16,7 @@ actix-rt = "1"
 actix-service = "1"
 actix-web = { version = "2", features = ["rustls"] }
 chrono = { version = "0.4", features = ["serde"] }
+config = "0.10"
 derive_more = "0.15"
 env_logger = "0.7"
 futures = "0.3"

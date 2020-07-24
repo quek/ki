@@ -10,8 +10,8 @@ release-build:
 	docker exec -it ki_server_1 cargo build --release
 	docker cp ki_server_1:/app/target/release/server ./production/server/app
 	docker cp ki_server_1:/usr/local/cargo/bin/movine ./production/server/app
-	cp -a ./client/dist ./production/web
-	cp -a ./server/migrations ./production/server/app
+	rsync -a --delete ./client/dist ./production/web
+	rsync -a --delete ./migrations ./production/server/app
 
 deploy: release-build
 	rsync -avz --delete production/ rep:sites/ki
@@ -27,6 +27,9 @@ recreate-db:
 	docker-compose down
 	docker volume rm ki_postgresql_data
 	$(MAKE) all
+
+production-db-dump:
+	ssh rep "docker exec ki_db_1 pg_dump -U ki -c ki_production"
 
 movine-up:
 	docker exec -w /app -it ki_server_1 movine up
