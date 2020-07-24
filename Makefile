@@ -13,7 +13,10 @@ release-build:
 	rsync -a --delete ./client/dist ./production/web
 	rsync -a --delete ./migrations ./production/server/app
 
-deploy: release-build
+production-deploy:
+	echo '本番にデプロイしますか？ [y/N]: ' && \
+	  read sure && case $$sure in [yY]) true;; *) false;; esac
+	$(MAKE) release-build
 	rsync -avz --delete production/ rep:sites/ki
 	ssh rep "cd sites/ki && docker-compose up -d --build"
 
