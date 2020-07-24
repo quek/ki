@@ -1,5 +1,5 @@
-use crate::common::models::{Id, Post};
 use crate::component::Link;
+use crate::generated::post::Post;
 use crate::routes::AppRoute;
 use crate::{fetch, utils};
 use yew::{html, Component, ComponentLink, Html, Properties, ShouldRender};
@@ -16,7 +16,7 @@ pub enum Msg {
 
 #[derive(Clone, Properties)]
 pub struct Props {
-    pub id: Id,
+    pub id: i32,
 }
 
 impl Component for Model {

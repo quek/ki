@@ -1,15 +1,7 @@
-#[cfg(target_arch = "x86_64")]
-use diesel_derive_enum::DbEnum;
-use serde::{Deserialize, Serialize};
+use crate::generated::post::PostStatus;
+use crate::generated::user::UserStatus;
 use std::fmt;
 use std::str;
-
-#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
-#[cfg_attr(target_arch = "x86_64", derive(DbEnum), DieselType = "User_status")]
-pub enum UserStatus {
-    Active,
-    Locked,
-}
 
 impl fmt::Display for UserStatus {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -31,13 +23,6 @@ impl str::FromStr for UserStatus {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
-#[cfg_attr(target_arch = "x86_64", derive(DbEnum), DieselType = "Post_status")]
-pub enum PostStatus {
-    Draft,
-    Published,
-}
-
 impl fmt::Display for PostStatus {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -47,7 +32,7 @@ impl fmt::Display for PostStatus {
     }
 }
 
-impl str::FromStr for PostStatus {
+impl std::str::FromStr for PostStatus {
     type Err = ();
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {

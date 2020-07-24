@@ -1,37 +1,30 @@
-#[macro_use]
-extern crate diesel;
-
 use actix_identity::{CookieIdentityPolicy, IdentityService};
 use actix_web::{middleware::Logger, web, App, HttpServer};
-use diesel::connection::Connection;
-use diesel::r2d2::ConnectionManager;
-use diesel::PgConnection;
 use listenfd::ListenFd;
+use serde::Deserialize;
 use std::env::var;
 use thread_data::ThreadData;
+use tokio_postgres::NoTls;
 
 pub mod api;
 pub mod auth;
 pub mod common;
 pub mod errors;
+pub mod generated;
 pub mod middleware;
-pub mod paginate;
-pub mod schema;
 pub mod thread_data;
 pub mod utils;
 
-// type alias to use in multiple places
-pub type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
+#[derive(Debug, Deserialize)]
+struct Config {
+    postgres: deadpool_postgres::Config,
+}
 
-#[derive(Copy, Clone, Debug)]
-pub struct MyConnectionCustomizer;
-
-// diesel が UTC ハードコードしているので
-// diesel-1.4.2/src/pg/connection/mod.rs set_config_options
-impl<E> r2d2::CustomizeConnection<PgConnection, E> for MyConnectionCustomizer {
-    fn on_acquire(&self, conn: &mut PgConnection) -> Result<(), E> {
-        conn.execute("SET TIME ZONE 'Japan'").unwrap();
-        Ok(())
+impl Config {
+    pub fn from_env() -> Result<Self, config::ConfigError> {
+        let mut cfg = config::Config::new();
+        cfg.merge(config::Environment::new().separator("_"))?;
+        cfg.try_into()
     }
 }
 
@@ -39,13 +32,8 @@ pub async fn run() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "server=debug,actix_web=info,actix_server=info");
     env_logger::init();
 
-    let postgres_url = var("DATABASE_URL").expect("DATABASE_URL must be set!");
-    let manager = ConnectionManager::<PgConnection>::new(postgres_url);
-    let connection_customizer = Box::new(MyConnectionCustomizer);
-    let pool: Pool = r2d2::Pool::builder()
-        .connection_customizer(connection_customizer)
-        .build(manager)
-        .expect("Failed to create pool!");
+    let cfg = Config::from_env().unwrap();
+    let dpool = cfg.postgres.create_pool(NoTls).unwrap();
 
     let server = HttpServer::new(move || {
         App::new()
@@ -57,7 +45,9 @@ pub async fn run() -> std::io::Result<()> {
                     .max_age_time(chrono::Duration::hours(12))
                     .secure(false), // this can only be true if you have https
             ))
-            .data(ThreadData { pool: pool.clone() })
+            .data(ThreadData {
+                dpool: dpool.clone(),
+            })
             .service(
                 web::scope("/api")
                     .route("/hello", web::get().to(api::hello))

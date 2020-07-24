@@ -1,6 +1,6 @@
-use crate::common::models::Post;
 use crate::component::Link;
 use crate::fetch;
+use crate::generated::post::Post;
 use crate::routes::AppRoute;
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 

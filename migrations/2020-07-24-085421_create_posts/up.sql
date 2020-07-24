@@ -12,7 +12,7 @@ CREATE TABLE posts (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-SELECT diesel_manage_updated_at('posts');
+SELECT manage_updated_at('posts');
 
 CREATE INDEX i_posts_published_at ON posts (published_at);
 

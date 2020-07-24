@@ -16,6 +16,7 @@ services:
     volumes:
       - .:/app
       - ~/.cargo:/cargo
+      - ../arysn:/arysn
     ports:
       - "7777:7777"
     environment:
@@ -30,12 +31,17 @@ services:
     volumes:
       - .:/app
       - ~/.cargo:/cargo
+      - ../arysn:/arysn
     environment:
       SECRET_KEY:
       REDIRECT_URL:
       GOOGLE_CLIENT_ID:
       GOOGLE_CLIENT_SECRET:
       DATABASE_URL:
+      POSTGRES_USER:
+      POSTGRES_PASSWORD:
+      POSTGRES_DBNAME:
+      POSTGRES_HOST:
       TZ: Asia/Tokyo
       CARGO_HOME: /cargo
       RUST_BACKTRACE: 1

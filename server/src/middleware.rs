@@ -1,13 +1,10 @@
-use crate::common::models::User;
-use crate::common::types::UserStatus;
 use crate::errors::ServiceError;
+use crate::generated::user::{User, UserStatus};
 use crate::thread_data::ThreadData;
+use actix_identity::Identity;
 use actix_service::{Service, Transform};
-use actix_web::dev::{ServiceRequest, ServiceResponse};
-use actix_web::web::block;
-use actix_web::{Error, FromRequest, ResponseError};
-use diesel::prelude::*;
-use diesel::PgConnection;
+use actix_web::dev::{Payload, ServiceRequest, ServiceResponse};
+use actix_web::{Error, FromRequest, HttpRequest, ResponseError};
 use futures::future::{ok, Future, Ready};
 use std::cell::RefCell;
 use std::pin::Pin;
@@ -65,35 +62,43 @@ where
 
             let (r, mut pl) = service_request.into_parts();
             let user = User::from_request(&r, &mut pl).await?;
-            let result = block::<_, _, ServiceError>(move || {
-                use crate::schema::users;
-                use diesel::dsl::{exists, select};
-                let conn: &PgConnection = &thread_data.pool.get().unwrap();
-                let exists = select(exists(
-                    users::table
-                        .filter(users::id.eq(user.id))
-                        .filter(users::status.eq(UserStatus::Active)),
-                ))
-                .get_result(conn)?;
-                if exists {
-                    Ok(())
-                } else {
-                    Err(ServiceError::Unauthorized)
-                }
-            })
-            .await;
+
+            let conn = &thread_data.dpool.get().await.unwrap();
+            let result = User::select()
+                .id()
+                .eq(user.id)
+                .status()
+                .eq(UserStatus::Active)
+                .first(conn)
+                .await;
 
             match ServiceRequest::from_parts(r, pl) {
                 Ok(service_request) => match result {
                     Ok(_) => Ok(service.call(service_request).await?),
                     Err(error) => {
-                        let service_error = ServiceError::from(error);
+                        let service_error = ServiceError::Unauthorized;
                         let response_error = service_error.error_response();
                         Ok(service_request.into_response(response_error.into_body()))
                     }
                 },
                 Err(_) => Err(Error::from(())),
             }
+        })
+    }
+}
+
+impl FromRequest for User {
+    type Config = ();
+    type Error = Error;
+    type Future = Pin<Box<dyn Future<Output = Result<User, Error>>>>;
+    fn from_request(request: &HttpRequest, payload: &mut Payload) -> Self::Future {
+        let future = Identity::from_request(request, payload);
+        Box::pin(async move {
+            if let Some(identity) = future.await?.identity() {
+                let user: User = serde_json::from_str(&identity)?;
+                return Ok(user);
+            };
+            Err(actix_http::error::ErrorUnauthorized("Unauthorized"))
         })
     }
 }

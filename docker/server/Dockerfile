@@ -1,4 +1,4 @@
-FROM  rust:1.42.0-slim-buster
+FROM rust:latest
 
 RUN apt update && apt install -y locales
 
@@ -11,8 +11,9 @@ RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ buster-pgdg main" | \
          tee /etc/apt/sources.list.d/pgdg.list
 RUN apt update && apt install -y libpq-dev postgresql-client-12
 
-RUN cargo install systemfd cargo-watch && \
-    cargo install diesel_cli --no-default-features --features postgres
+RUN cargo install systemfd cargo-watch
+
+RUN cargo install movine
 
 RUN rustup component add rls rust-analysis rust-src
 RUN rustup component add rustfmt
@@ -25,4 +26,5 @@ WORKDIR /app/server
 CMD ["/wait-for-it.sh", "db:5432", "--", \
      "systemfd", "--no-pid", "-s", "0.0.0.0:7778", "--", \
      "cargo", "watch", "--watch", ".", \
+     "--ignore", "src/generated", \
      "-x", "run"]

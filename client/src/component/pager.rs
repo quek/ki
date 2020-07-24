@@ -1,7 +1,7 @@
 use web_sys::MouseEvent;
 use yew::{html, Callback, Component, ComponentLink, Html, Properties, ShouldRender};
 
-const NPAGES: i64 = 5;
+const NPAGES: usize = 5;
 
 pub struct Model {
     link: ComponentLink<Self>,
@@ -9,15 +9,15 @@ pub struct Model {
 }
 
 pub enum Msg {
-    Click(MouseEvent, i64),
+    Click(MouseEvent, usize),
 }
 
 #[derive(Clone, Properties)]
 pub struct Props {
-    pub page: i64,
-    pub per_page: i64,
-    pub total: i64,
-    pub callback: Callback<i64>,
+    pub page: usize,
+    pub per_page: usize,
+    pub total: usize,
+    pub callback: Callback<usize>,
 }
 
 impl Component for Model {
@@ -73,7 +73,7 @@ impl Model {
         }
     }
 
-    fn pages(&self) -> Vec<i64> {
+    fn pages(&self) -> Vec<usize> {
         let from = std::cmp::max(self.props.page - NPAGES, 1);
         let to = std::cmp::min(self.props.page + NPAGES, self.total_pages());
         (from..=to).collect()
@@ -91,7 +91,7 @@ impl Model {
         }
     }
 
-    fn render_page(&self, page: i64) -> yew::Html {
+    fn render_page(&self, page: usize) -> yew::Html {
         if page == self.props.page {
             yew::html! {
                 <div>{page}</div>
@@ -104,7 +104,7 @@ impl Model {
         }
     }
 
-    fn total_pages(&self) -> i64 {
-        (self.props.total as f64 / self.props.per_page as f64).ceil() as i64
+    fn total_pages(&self) -> usize {
+        (self.props.total as f64 / self.props.per_page as f64).ceil() as usize
     }
 }

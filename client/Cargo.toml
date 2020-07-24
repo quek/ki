@@ -38,6 +38,3 @@ features = [
   "Window",
   "console"
 ]
-
-[profile.release]
-opt-level = "z"

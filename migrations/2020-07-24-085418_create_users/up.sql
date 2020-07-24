@@ -11,7 +11,7 @@ CREATE TABLE users (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-SELECT diesel_manage_updated_at('users');
+SELECT manage_updated_at('users');
 
 INSERT INTO users(email, name, status) VALUES (
 'read.eval.print@gmail.com', 'Tahara', 'active'

@@ -40,25 +40,9 @@ impl From<actix_web::error::BlockingError<ServiceError>> for ServiceError {
     }
 }
 
-impl From<diesel::result::Error> for ServiceError {
-    fn from(error: diesel::result::Error) -> ServiceError {
-        // Right now we just care about UniqueViolation from diesel
-        // But this would be helpful to easily map errors as our app grows
-        match error {
-            diesel::result::Error::DatabaseError(kind, info) => {
-                let message = info.details().unwrap_or_else(|| info.message()).to_string();
-                log::error!(
-                    "diesel::result::Error kind: {:?}, message: {}",
-                    kind,
-                    message
-                );
-                if let diesel::result::DatabaseErrorKind::UniqueViolation = kind {
-                    return ServiceError::BadRequest(message);
-                }
-                ServiceError::InternalServerError
-            }
-            diesel::result::Error::NotFound => ServiceError::NotFound,
-            _ => ServiceError::InternalServerError,
-        }
+impl From<anyhow::Error> for ServiceError {
+    fn from(error: anyhow::Error) -> ServiceError {
+        log::error!("{:#?}", &error);
+        ServiceError::InternalServerError
     }
 }

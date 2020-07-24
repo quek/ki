@@ -1,7 +1,8 @@
 use crate::common::form::{PostErrors, PostForm};
-use crate::common::models::{Id, Post};
+use crate::common::models::Id;
 use crate::component::admin::posts::form;
 use crate::fetch;
+use crate::generated::post::Post;
 use crate::utils;
 use yew::{html, Component, ComponentLink, Html, Properties, ShouldRender};
 

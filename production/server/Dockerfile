@@ -6,6 +6,9 @@ ENV LANG ja_JP.UTF-8
 
 RUN apt update && apt install -y libpq-dev
 
+# for movine
+RUN apt update && apt install -y libsqlite3-0
+
 COPY app /app
 
 WORKDIR /app
