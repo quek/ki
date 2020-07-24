@@ -9,7 +9,7 @@ release-build:
 	docker exec -it ki_client_1 yarn release
 	docker exec -it ki_server_1 cargo build --release
 	docker cp ki_server_1:/app/target/release/server ./production/server/app
-	docker cp ki_server_1:/usr/local/cargo/bin/diesel ./production/server/app
+	docker cp ki_server_1:/usr/local/cargo/bin/movine ./production/server/app
 	cp -a ./client/dist ./production/web
 	cp -a ./server/migrations ./production/server/app
 
@@ -23,8 +23,25 @@ clean:
 clean-all: clean
 	docker volume rm ki_postgresql_data
 
-migration-run:
-	docker exec -it ki_server_1 diesel migration run
+recreate-db:
+	docker-compose down
+	docker volume rm ki_postgresql_data
+	$(MAKE) all
+
+movine-up:
+	docker exec -w /app -it ki_server_1 movine up
+
+movine-down:
+	docker exec -w /app -it ki_server_1 movine down
+
+movine-fix:
+	docker exec -w /app -it ki_server_1 movine fix
+
+movine-redo:
+	docker exec -w /app -it ki_server_1 movine redo
+
+movine-status:
+	docker exec -w /app -it ki_server_1 movine status
 
 psql:
 	docker exec -it ki_db_1 psql -U ki ki_development
