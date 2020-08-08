@@ -23,6 +23,6 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.13.0",
-    "prismjs": "^1.20.0"
+    "prismjs": "^1.21.0"
   }
 }
